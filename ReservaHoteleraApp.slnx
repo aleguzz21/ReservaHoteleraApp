@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="ReservaHoteleraApp.Api/ReservaHoteleraApp.Api.csproj" Id="e9755af5-2701-4093-9b67-e42b9b9506c2" />
+  </Folder>
+  <Folder Name="/DataAccess/">
+    <Project Path="ReservaHoteleraApp.Domain/ReservaHoteleraApp.DataAccess.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="ReservaHoteleraApp.Infraestructure/ReservaHoteleraApp.Domain.csproj" />
+  </Folder>
+  <Folder Name="/WebApp/">
+    <Project Path="ReservaHoteleraApp.Web/ReservaHoteleraApp.Web.csproj" Id="4a7207f3-ab25-4cbe-a1ad-796e3fd18f55" />
+  </Folder>
+</Solution>
