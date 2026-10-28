@@ -1,7 +1,15 @@
+using ReservaHoteleraApp.BL;
+using ReservaHoteleraApp.DAL;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+builder.Services.AddDataAccess(builder.Configuration);
+builder.Services.AddBusinessLogic();
 
 var app = builder.Build();
 
