@@ -4,12 +4,8 @@ using ReservaHoteleraApp.DAL.Models.Result;
 
 namespace ReservaHoteleraApp.DAL.Repositories
 {
-    public interface IPagoRepository
+    public interface IPagoRepository : IRepository<Pago, PagoModel, PagoAdd, PagoUpdate, PagoRemove>
     {
-        Task<OperationResult<List<Pago>>> GetAllAsync();
-        Task<OperationResult<PagoModel>?> GetByIdAsync(int id);
-        Task<OperationResult<bool>> AddAsync(PagoAdd pago);
-        Task<OperationResult<bool>> UpdateAsync(PagoUpdate pago);
-        Task<OperationResult<bool>> DeleteAsync(PagoRemove pago);
+   
     }
 }

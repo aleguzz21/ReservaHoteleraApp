@@ -7,15 +7,14 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services
 {
-    public class ReservaServices : IReservaServices
+    public class ReservaServices : ServiceBase, IReservaServices
     {
         private readonly IReservaRepository _repository;
-        private readonly ILogger<ReservaServices> _logger;
 
         public ReservaServices(IReservaRepository repository, ILogger<ReservaServices> logger)
+            : base(logger)
         {
             _repository = repository;
-            _logger = logger;
         }
 
         public Task<OperationResult<List<ReservaModel>>> GetAllAsync()
@@ -86,18 +85,9 @@ namespace ReservaHoteleraApp.BL.Services
             });
         }
 
-        private async Task<OperationResult<T>> ExecuteAsync<T>(string operation, int? userId, Func<Task<OperationResult<T>>> action)
+        public Task<OperationResult<bool>> DeleteAsync(ReservaRemove? reserva)
         {
-            try
-            {
-                _logger.LogInformation("Ejecutando {Operation}. Usuario: {UserId}", operation, userId);
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al ejecutar {Operation}. Usuario: {UserId}", operation, userId);
-                return Failure<T>("Ocurrió un error inesperado. Intente nuevamente.");
-            }
+            return DeleteEntityAsync(reserva, _repository.DeleteAsync, "la reserva");
         }
 
         private static string? ValidateReserva(ReservaBase reserva)

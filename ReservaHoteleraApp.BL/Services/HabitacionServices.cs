@@ -7,15 +7,14 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services
 {
-    public class HabitacionServices : IHabitacionServices
+    public class HabitacionServices : ServiceBase, IHabitacionServices
     {
         private readonly IHabitacionRepository _repository;
-        private readonly ILogger<HabitacionServices> _logger;
 
         public HabitacionServices(IHabitacionRepository repository, ILogger<HabitacionServices> logger)
+            : base(logger)
         {
             _repository = repository;
-            _logger = logger;
         }
 
         public Task<OperationResult<List<HabitacionModel>>> GetAllAsync()
@@ -86,18 +85,9 @@ namespace ReservaHoteleraApp.BL.Services
             });
         }
 
-        private async Task<OperationResult<T>> ExecuteAsync<T>(string operation, int? userId, Func<Task<OperationResult<T>>> action)
+        public Task<OperationResult<bool>> DeleteAsync(HabitacionRemove? habitacion)
         {
-            try
-            {
-                _logger.LogInformation("Ejecutando {Operation}. Usuario: {UserId}", operation, userId);
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al ejecutar {Operation}. Usuario: {UserId}", operation, userId);
-                return Failure<T>("Ocurrió un error inesperado. Intente nuevamente.");
-            }
+            return DeleteEntityAsync(habitacion, _repository.DeleteAsync, "la habitación");
         }
 
         private static string? ValidateHabitacion(HabitacionBase habitacion)

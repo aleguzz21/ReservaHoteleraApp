@@ -4,12 +4,8 @@ using ReservaHoteleraApp.DAL.Models.Result;
 
 namespace ReservaHoteleraApp.DAL.Repositories
 {
-    public interface IEstadiaRepository
+    public interface IEstadiaRepository : IRepository<Estadia, EstadiaModel, EstadiaAdd, EstadiaUpdate, EstadiaRemove>
     {
-        Task<OperationResult<List<Estadia>>> GetAllAsync();
-        Task<OperationResult<EstadiaModel>?> GetByIdAsync(int id);
-        Task<OperationResult<bool>> AddAsync(EstadiaAdd estadia);
-        Task<OperationResult<bool>> UpdateAsync(EstadiaUpdate estadia);
-        Task<OperationResult<bool>> DeleteAsync(EstadiaRemove estadia);
+  
     }
 }

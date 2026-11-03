@@ -5,17 +5,17 @@ using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
+
 namespace ReservaHoteleraApp.BL.Services
 {
-    public class UsuarioServices : IUsuarioServices
+    public class UsuarioServices : ServiceBase , IUsuarioServices
     {
         private readonly IUsuarioRepository _repository;
-        private readonly ILogger<UsuarioServices> _logger;
-
-        public UsuarioServices(IUsuarioRepository repository, ILogger<UsuarioServices> logger)
+        
+        public UsuarioServices(IUsuarioRepository repository, ILogger<UsuarioServices> logger) : base(logger)
         {
             _repository = repository;
-            _logger = logger;
+           
         }
 
         public Task<OperationResult<List<UsuarioModel>>> GetAllAsync()
@@ -86,21 +86,11 @@ namespace ReservaHoteleraApp.BL.Services
             });
         }
 
-        private async Task<OperationResult<T>> ExecuteAsync<T>(string operation, int? userId, Func<Task<OperationResult<T>>> action)
-        {
-            try
-            {
-                _logger.LogInformation("Ejecutando {Operation}. Usuario: {UserId}", operation, userId);
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al ejecutar {Operation}. Usuario: {UserId}", operation, userId);
-                return Failure<T>("Ocurrió un error inesperado. Intente nuevamente.");
-            }
+        public Task<OperationResult<bool>> DeleteAsync(UsuarioRemove? usuario) {
+            return DeleteEntityAsync(usuario, _repository.DeleteAsync, "el usuario");
         }
 
-        private static string? ValidateUsuario(UsuarioBase usuario)
+           private static string? ValidateUsuario(UsuarioBase usuario)
         {
             if (string.IsNullOrWhiteSpace(usuario.NombreUsuario))
                 return "El nombre de usuario es requerido.";
@@ -117,6 +107,8 @@ namespace ReservaHoteleraApp.BL.Services
 
             return null;
         }
+
+
 
         private static UsuarioModel MapToModel(Usuario usuario)
         {

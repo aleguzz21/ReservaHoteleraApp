@@ -9,5 +9,6 @@ namespace ReservaHoteleraApp.BL.Services
         Task<OperationResult<EstadiaModel>> GetByIdAsync(int id);
         Task<OperationResult<bool>> AddAsync(EstadiaAdd? estadia);
         Task<OperationResult<bool>> UpdateAsync(EstadiaUpdate? estadia);
+        Task<OperationResult<bool>> DeleteAsync(EstadiaRemove? estadia);
     }
 }

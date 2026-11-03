@@ -7,15 +7,14 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services
 {
-    public class EstadiaServices : IEstadiaServices
+    public class EstadiaServices : ServiceBase, IEstadiaServices
     {
         private readonly IEstadiaRepository _repository;
-        private readonly ILogger<EstadiaServices> _logger;
 
         public EstadiaServices(IEstadiaRepository repository, ILogger<EstadiaServices> logger)
+            : base(logger)
         {
             _repository = repository;
-            _logger = logger;
         }
 
         public Task<OperationResult<List<EstadiaModel>>> GetAllAsync()
@@ -86,18 +85,9 @@ namespace ReservaHoteleraApp.BL.Services
             });
         }
 
-        private async Task<OperationResult<T>> ExecuteAsync<T>(string operation, int? userId, Func<Task<OperationResult<T>>> action)
+        public Task<OperationResult<bool>> DeleteAsync(EstadiaRemove? estadia)
         {
-            try
-            {
-                _logger.LogInformation("Ejecutando {Operation}. Usuario: {UserId}", operation, userId);
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al ejecutar {Operation}. Usuario: {UserId}", operation, userId);
-                return Failure<T>("Ocurrió un error inesperado. Intente nuevamente.");
-            }
+            return DeleteEntityAsync(estadia, _repository.DeleteAsync, "la estadía");
         }
 
         private static string? ValidateEstadia(EstadiaBase estadia)

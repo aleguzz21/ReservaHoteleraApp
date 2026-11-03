@@ -7,15 +7,14 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services
 {
-    public class RegistroActividadServices : IRegistroActividadServices
+    public class RegistroActividadServices : ServiceBase, IRegistroActividadServices
     {
         private readonly IRegistroActividadRepository _repository;
-        private readonly ILogger<RegistroActividadServices> _logger;
 
         public RegistroActividadServices(IRegistroActividadRepository repository, ILogger<RegistroActividadServices> logger)
+            : base(logger)
         {
             _repository = repository;
-            _logger = logger;
         }
 
         public Task<OperationResult<List<RegistroActividadModel>>> GetAllAsync()
@@ -86,18 +85,9 @@ namespace ReservaHoteleraApp.BL.Services
             });
         }
 
-        private async Task<OperationResult<T>> ExecuteAsync<T>(string operation, int? userId, Func<Task<OperationResult<T>>> action)
+        public Task<OperationResult<bool>> DeleteAsync(RegistroActividadRemove? registroActividad)
         {
-            try
-            {
-                _logger.LogInformation("Ejecutando {Operation}. Usuario: {UserId}", operation, userId);
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al ejecutar {Operation}. Usuario: {UserId}", operation, userId);
-                return Failure<T>("Ocurrió un error inesperado. Intente nuevamente.");
-            }
+            return DeleteEntityAsync(registroActividad, _repository.DeleteAsync, "el registro de actividad");
         }
 
         private static string? ValidateRegistroActividad(RegistroActividadBase registroActividad)
