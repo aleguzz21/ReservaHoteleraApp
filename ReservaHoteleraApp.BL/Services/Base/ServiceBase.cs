@@ -6,7 +6,7 @@ using ReservaHoteleraApp.DAL.Models;
 using Microsoft.Extensions.Logging;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
-namespace ReservaHoteleraApp.BL.Services
+namespace ReservaHoteleraApp.BL.Services.Base
 {
     public abstract class ServiceBase
     {

@@ -1,11 +1,13 @@
 using Microsoft.Extensions.Logging;
+using ReservaHoteleraApp.BL.Services.Base;
+using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion;
 using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
-namespace ReservaHoteleraApp.BL.Services
+namespace ReservaHoteleraApp.BL.Services.Implementations
 {
     public class TipoHabitacionServices : ServiceBase, ITipoHabitacionServices
     {

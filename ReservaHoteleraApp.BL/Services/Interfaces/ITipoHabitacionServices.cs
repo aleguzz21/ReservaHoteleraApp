@@ -1,7 +1,7 @@
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion;
 
-namespace ReservaHoteleraApp.BL.Services
+namespace ReservaHoteleraApp.BL.Services.Interfaces
 {
     public interface ITipoHabitacionServices
     {

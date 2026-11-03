@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using ReservaHoteleraApp.BL.Services;
+using ReservaHoteleraApp.BL.Services.Implementations;
+using ReservaHoteleraApp.BL.Services.Interfaces;
 
 namespace ReservaHoteleraApp.BL
 {
