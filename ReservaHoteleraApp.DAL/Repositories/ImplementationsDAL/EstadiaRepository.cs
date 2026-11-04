@@ -3,9 +3,10 @@ using ReservaHoteleraApp.DAL.Data;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Estadia;
 using ReservaHoteleraApp.DAL.Models.Result;
+using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
-namespace ReservaHoteleraApp.DAL.Repositories
+namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
 {
     public class EstadiaRepository : IEstadiaRepository
     {

@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ReservaHoteleraApp.DAL.Data;
-using ReservaHoteleraApp.DAL.Repositories;
+using ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL;
+using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 
 namespace ReservaHoteleraApp.DAL
 {

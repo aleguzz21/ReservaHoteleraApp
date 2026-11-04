@@ -4,7 +4,7 @@ using System.Text;
 using ReservaHoteleraApp.DAL.Models.Base;
 using ReservaHoteleraApp.DAL.Models;
 
-namespace ReservaHoteleraApp.DAL.Repositories
+namespace ReservaHoteleraApp.DAL.Repositories.BaseDAL
 {
     public interface IRepository<TEntity, TModel, TAdd, TUpdate, TRemove>
         where TAdd : class

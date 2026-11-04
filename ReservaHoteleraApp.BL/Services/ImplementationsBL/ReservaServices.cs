@@ -4,7 +4,7 @@ using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Reserva;
 using ReservaHoteleraApp.DAL.Models.Result;
-using ReservaHoteleraApp.DAL.Repositories;
+using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services.Implementations
