@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Reserva;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<ReservaModel>>("Consultar reservas", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<ReservaModel>>(result.Message ?? "No fue posible consultar las reservas.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<ReservaModel>>
-                {
-                    Data = models,
-                    Message = "Reservas consultadas correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<ReservaModel>("El identificador de la reserva debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<ReservaModel>("La reserva no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -110,21 +96,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "La fecha de salida no puede ser anterior a la fecha de entrada.";
 
             return null;
-        }
-
-        private static ReservaModel MapToModel(Reserva reserva)
-        {
-            return new ReservaModel
-            {
-                Id = reserva.Id,
-                IdCliente = reserva.IdCliente,
-                IdHabitacion = reserva.IdHabitacion,
-                CantidadPersonas = reserva.CantidadPersonas,
-                Estado = reserva.Estado,
-                TotalReserva = reserva.TotalReserva,
-                FechaEntrada = reserva.FechaEntrada,
-                FechaSalida = reserva.FechaSalida
-            };
         }
     }
 }

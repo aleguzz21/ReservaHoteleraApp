@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Habitacion;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<HabitacionModel>>("Consultar habitaciones", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<HabitacionModel>>(result.Message ?? "No fue posible consultar las habitaciones.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<HabitacionModel>>
-                {
-                    Data = models,
-                    Message = "Habitaciones consultadas correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<HabitacionModel>("El identificador de la habitación debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<HabitacionModel>("La habitación no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -106,18 +92,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "El estado no puede superar los 20 caracteres.";
 
             return null;
-        }
-
-        private static HabitacionModel MapToModel(Habitacion habitacion)
-        {
-            return new HabitacionModel
-            {
-                Id = habitacion.Id,
-                Numero = habitacion.Numero,
-                IdTipoHabitacion = habitacion.IdTipoHabitacion,
-                PrecioNoche = habitacion.PrecioNoche,
-                Estado = habitacion.Estado
-            };
         }
     }
 }

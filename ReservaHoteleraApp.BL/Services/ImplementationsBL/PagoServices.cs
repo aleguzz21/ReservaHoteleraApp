@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Pago;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<PagoModel>>("Consultar pagos", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<PagoModel>>(result.Message ?? "No fue posible consultar los pagos.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<PagoModel>>
-                {
-                    Data = models,
-                    Message = "Pagos consultados correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<PagoModel>("El identificador del pago debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<PagoModel>("El pago no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -104,18 +90,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "El método de pago no puede superar los 50 caracteres.";
 
             return null;
-        }
-
-        private static PagoModel MapToModel(Pago pago)
-        {
-            return new PagoModel
-            {
-                Id = pago.Id,
-                IdReserva = pago.IdReserva,
-                Monto = pago.Monto,
-                Fecha = pago.Fecha,
-                MetodoPago = pago.MetodoPago
-            };
         }
     }
 }

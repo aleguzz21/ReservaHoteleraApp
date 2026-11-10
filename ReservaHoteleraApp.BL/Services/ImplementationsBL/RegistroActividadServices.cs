@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.RegistroActividad;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<RegistroActividadModel>>("Consultar registros de actividad", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<RegistroActividadModel>>(result.Message ?? "No fue posible consultar los registros de actividad.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<RegistroActividadModel>>
-                {
-                    Data = models,
-                    Message = "Registros de actividad consultados correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<RegistroActividadModel>("El identificador del registro debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<RegistroActividadModel>("El registro de actividad no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -102,17 +88,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "La acción no puede superar los 255 caracteres.";
 
             return null;
-        }
-
-        private static RegistroActividadModel MapToModel(RegistroActividad registroActividad)
-        {
-            return new RegistroActividadModel
-            {
-                Id = registroActividad.Id,
-                IdUsuario = registroActividad.IdUsuario,
-                Accion = registroActividad.Accion,
-                FechaHora = registroActividad.FechaHora
-            };
         }
     }
 }

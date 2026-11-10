@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ReservaHoteleraApp.DAL.Data;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Cliente;
@@ -11,34 +12,53 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
     public class ClienteRepository : IClienteRepository
     {
         private readonly HotelDbContext context;
+        private readonly ILogger<ClienteRepository> logger;
 
-        public ClienteRepository(HotelDbContext context)
+        public ClienteRepository(HotelDbContext context, ILogger<ClienteRepository> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
-        public async Task<OperationResult<List<Cliente>>> GetAllAsync()
+        public async Task<OperationResult<List<ClienteModel>>> GetAllAsync()
         {
-            var clientes = await context.Clientes.AsNoTracking().ToListAsync();
-
-            return new OperationResult<List<Cliente>>
+            try
             {
-                Data = clientes,
-                Message = "Clientes consultados correctamente."
-            };
+                var clientes = await context.Clientes.AsNoTracking().ToListAsync();
+                var models = clientes.Select(MapToModel).ToList();
+
+                return new OperationResult<List<ClienteModel>>
+                {
+                    Data = models,
+                    Message = "Clientes consultados correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar los clientes.");
+                return Failure<List<ClienteModel>>("No se pudieron consultar los clientes.");
+            }
         }
 
-        public async Task<OperationResult<ClienteModel>?> GetByIdAsync(int id)
+        public async Task<OperationResult<ClienteModel>> GetByIdAsync(int id)
         {
-            var cliente = await context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-            if (cliente is null)
-                return null;
-
-            return new OperationResult<ClienteModel>
+            try
             {
-                Data = MapToModel(cliente),
-                Message = "Cliente consultado correctamente."
-            };
+                var cliente = await context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                if (cliente is null)
+                    return Failure<ClienteModel>("El cliente no existe.");
+
+                return new OperationResult<ClienteModel>
+                {
+                    Data = MapToModel(cliente),
+                    Message = "Cliente consultado correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar el cliente con id {Id}.", id);
+                return Failure<ClienteModel>("No se pudo consultar el cliente.");
+            }
         }
 
         public async Task<OperationResult<bool>> AddAsync(ClienteAdd cliente)
@@ -50,25 +70,38 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (validation is not null)
                 return Failure<bool>(validation);
 
-            var entity = new Cliente
+            try
             {
-                IdUsuario = cliente.IdUsuario,
-                NombreCliente = cliente.NombreCliente!.Trim(),
-                Documento = cliente.Documento!.Trim(),
-                Correo = cliente.Correo!.Trim(),
-                Telefono = cliente.Telefono?.Trim(),
-                CreatedDate = DateTime.UtcNow,
-                CreatedUser = cliente.CreatedUser
-            };
+                var entity = new Cliente
+                {
+                    IdUsuario = cliente.IdUsuario,
+                    NombreCliente = cliente.NombreCliente!.Trim(),
+                    Documento = cliente.Documento!.Trim(),
+                    Correo = cliente.Correo!.Trim(),
+                    Telefono = cliente.Telefono?.Trim(),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedUser = cliente.CreatedUser
+                };
 
-            await context.Clientes.AddAsync(entity);
-            await context.SaveChangesAsync();
+                await context.Clientes.AddAsync(entity);
+                await context.SaveChangesAsync();
 
-            return new OperationResult<bool>
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Cliente registrado correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
             {
-                Data = true,
-                Message = "Cliente registrado correctamente."
-            };
+                logger.LogError(ex, "Error de base de datos al registrar el cliente.");
+                return Failure<bool>("No se pudo registrar el cliente. Verifique datos duplicados o referencias que no existen.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al registrar el cliente.");
+                return Failure<bool>("Ocurrió un error inesperado al registrar el cliente.");
+            }
         }
 
         public async Task<OperationResult<bool>> UpdateAsync(ClienteUpdate cliente)
@@ -80,25 +113,38 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (validation is not null)
                 return Failure<bool>(validation);
 
-            var entity = await context.Clientes.FirstOrDefaultAsync(c => c.Id == cliente.Id);
-            if (entity is null)
-                return Failure<bool>("El cliente no existe.");
-
-            entity.IdUsuario = cliente.IdUsuario;
-            entity.NombreCliente = cliente.NombreCliente!.Trim();
-            entity.Documento = cliente.Documento!.Trim();
-            entity.Correo = cliente.Correo!.Trim();
-            entity.Telefono = cliente.Telefono?.Trim();
-            entity.ModifyDate = DateTime.UtcNow;
-            entity.ModifyUser = cliente.ModifyUser;
-
-            await context.SaveChangesAsync();
-
-            return new OperationResult<bool>
+            try
             {
-                Data = true,
-                Message = "Cliente actualizado correctamente."
-            };
+                var entity = await context.Clientes.FirstOrDefaultAsync(c => c.Id == cliente.Id);
+                if (entity is null)
+                    return Failure<bool>("El cliente no existe.");
+
+                entity.IdUsuario = cliente.IdUsuario;
+                entity.NombreCliente = cliente.NombreCliente!.Trim();
+                entity.Documento = cliente.Documento!.Trim();
+                entity.Correo = cliente.Correo!.Trim();
+                entity.Telefono = cliente.Telefono?.Trim();
+                entity.ModifyDate = DateTime.UtcNow;
+                entity.ModifyUser = cliente.ModifyUser;
+
+                await context.SaveChangesAsync();
+
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Cliente actualizado correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error de base de datos al actualizar el cliente.");
+                return Failure<bool>("No se pudo actualizar el cliente. Verifique datos duplicados o referencias que no existen.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al actualizar el cliente.");
+                return Failure<bool>("Ocurrió un error inesperado al actualizar el cliente.");
+            }
         }
 
         public async Task<OperationResult<bool>> DeleteAsync(ClienteRemove cliente)
@@ -106,18 +152,31 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (cliente is null)
                 return Failure<bool>("El objeto ClienteRemove es requerido.");
 
-            var entity = await context.Clientes.FirstOrDefaultAsync(c => c.Id == cliente.Id);
-            if (entity is null)
-                return Failure<bool>("El cliente no existe.");
-
-            context.Clientes.Remove(entity);
-            await context.SaveChangesAsync();
-
-            return new OperationResult<bool>
+            try
             {
-                Data = true,
-                Message = "Cliente eliminado correctamente."
-            };
+                var entity = await context.Clientes.FirstOrDefaultAsync(c => c.Id == cliente.Id);
+                if (entity is null)
+                    return Failure<bool>("El cliente no existe.");
+
+                context.Clientes.Remove(entity);
+                await context.SaveChangesAsync();
+
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Cliente eliminado correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error de base de datos al eliminar el cliente.");
+                return Failure<bool>("No se pudo eliminar el cliente porque tiene registros relacionados.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al eliminar el cliente.");
+                return Failure<bool>("Ocurrió un error inesperado al eliminar el cliente.");
+            }
         }
 
         private static string? ValidateCliente(ClienteBase cliente)

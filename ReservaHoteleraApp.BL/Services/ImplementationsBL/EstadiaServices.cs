@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Estadia;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<EstadiaModel>>("Consultar estadías", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<EstadiaModel>>(result.Message ?? "No fue posible consultar las estadías.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<EstadiaModel>>
-                {
-                    Data = models,
-                    Message = "Estadías consultadas correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<EstadiaModel>("El identificador de la estadía debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<EstadiaModel>("La estadía no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -104,18 +90,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "La fecha de salida no puede ser anterior a la fecha de entrada.";
 
             return null;
-        }
-
-        private static EstadiaModel MapToModel(Estadia estadia)
-        {
-            return new EstadiaModel
-            {
-                Id = estadia.Id,
-                IdReserva = estadia.IdReserva,
-                IdUsuario = estadia.IdUsuario,
-                FechaEntrada = estadia.FechaEntrada,
-                FechaSalida = estadia.FechaSalida
-            };
         }
     }
 }

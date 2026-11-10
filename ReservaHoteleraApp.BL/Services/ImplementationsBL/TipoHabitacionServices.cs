@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<TipoHabitacionModel>>("Consultar tipos de habitación", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<TipoHabitacionModel>>(result.Message ?? "No fue posible consultar los tipos de habitación.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<TipoHabitacionModel>>
-                {
-                    Data = models,
-                    Message = "Tipos de habitación consultados correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<TipoHabitacionModel>("El identificador debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<TipoHabitacionModel>("El tipo de habitación no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -106,18 +92,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "El precio no puede ser negativo.";
 
             return null;
-        }
-
-        private static TipoHabitacionModel MapToModel(TipoHabitacion tipoHabitacion)
-        {
-            return new TipoHabitacionModel
-            {
-                Id = tipoHabitacion.Id,
-                Nombre = tipoHabitacion.Nombre,
-                Descripcion = tipoHabitacion.Descripcion,
-                Capacidad = tipoHabitacion.Capacidad,
-                Precio = tipoHabitacion.Precio
-            };
         }
     }
 }

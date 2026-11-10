@@ -3,7 +3,6 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Cliente;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
@@ -23,16 +22,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
         {
             return ExecuteAsync<List<ClienteModel>>("Consultar clientes", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<ClienteModel>>(result.Message ?? "No fue posible consultar los clientes.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<ClienteModel>>
-                {
-                    Data = models,
-                    Message = "Clientes consultados correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -43,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<ClienteModel>("El identificador del cliente debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<ClienteModel>("El cliente no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -114,19 +100,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "El teléfono no puede superar los 25 caracteres.";
 
             return null;
-        }
-
-        private static ClienteModel MapToModel(Cliente cliente)
-        {
-            return new ClienteModel
-            {
-                Id = cliente.Id,
-                IdUsuario = cliente.IdUsuario,
-                NombreCliente = cliente.NombreCliente,
-                Documento = cliente.Documento,
-                Correo = cliente.Correo,
-                Telefono = cliente.Telefono
-            };
         }
     }
 }

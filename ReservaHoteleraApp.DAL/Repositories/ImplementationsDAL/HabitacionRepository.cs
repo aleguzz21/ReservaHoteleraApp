@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ReservaHoteleraApp.DAL.Data;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Habitacion;
@@ -11,34 +12,53 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
     public class HabitacionRepository : IHabitacionRepository
     {
         private readonly HotelDbContext context;
+        private readonly ILogger<HabitacionRepository> logger;
 
-        public HabitacionRepository(HotelDbContext context)
+        public HabitacionRepository(HotelDbContext context, ILogger<HabitacionRepository> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
-        public async Task<OperationResult<List<Habitacion>>> GetAllAsync()
+        public async Task<OperationResult<List<HabitacionModel>>> GetAllAsync()
         {
-            var habitaciones = await context.Habitaciones.AsNoTracking().ToListAsync();
-
-            return new OperationResult<List<Habitacion>>
+            try
             {
-                Data = habitaciones,
-                Message = "Habitaciones consultadas correctamente."
-            };
+                var habitaciones = await context.Habitaciones.AsNoTracking().ToListAsync();
+                var models = habitaciones.Select(MapToModel).ToList();
+
+                return new OperationResult<List<HabitacionModel>>
+                {
+                    Data = models,
+                    Message = "Habitaciones consultadas correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar las habitaciones.");
+                return Failure<List<HabitacionModel>>("No se pudieron consultar las habitaciones.");
+            }
         }
 
-        public async Task<OperationResult<HabitacionModel>?> GetByIdAsync(int id)
+        public async Task<OperationResult<HabitacionModel>> GetByIdAsync(int id)
         {
-            var habitacion = await context.Habitaciones.AsNoTracking().FirstOrDefaultAsync(h => h.Id == id);
-            if (habitacion is null)
-                return null;
-
-            return new OperationResult<HabitacionModel>
+            try
             {
-                Data = MapToModel(habitacion),
-                Message = "Habitación consultada correctamente."
-            };
+                var habitacion = await context.Habitaciones.AsNoTracking().FirstOrDefaultAsync(h => h.Id == id);
+                if (habitacion is null)
+                    return Failure<HabitacionModel>("La habitación no existe.");
+
+                return new OperationResult<HabitacionModel>
+                {
+                    Data = MapToModel(habitacion),
+                    Message = "Habitación consultada correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar la habitación con id {Id}.", id);
+                return Failure<HabitacionModel>("No se pudo consultar la habitación.");
+            }
         }
 
         public async Task<OperationResult<bool>> AddAsync(HabitacionAdd habitacion)
@@ -50,24 +70,37 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (validation is not null)
                 return Failure<bool>(validation);
 
-            var entity = new Habitacion
+            try
             {
-                Numero = habitacion.Numero!.Trim(),
-                IdTipoHabitacion = habitacion.IdTipoHabitacion,
-                PrecioNoche = habitacion.PrecioNoche,
-                Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim(),
-                CreatedDate = DateTime.UtcNow,
-                CreatedUser = habitacion.CreatedUser
-            };
+                var entity = new Habitacion
+                {
+                    Numero = habitacion.Numero!.Trim(),
+                    IdTipoHabitacion = habitacion.IdTipoHabitacion,
+                    PrecioNoche = habitacion.PrecioNoche,
+                    Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim(),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedUser = habitacion.CreatedUser
+                };
 
-            await context.Habitaciones.AddAsync(entity);
-            await context.SaveChangesAsync();
+                await context.Habitaciones.AddAsync(entity);
+                await context.SaveChangesAsync();
 
-            return new OperationResult<bool>
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Habitación registrada correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
             {
-                Data = true,
-                Message = "Habitación registrada correctamente."
-            };
+                logger.LogError(ex, "Error de base de datos al registrar la habitación.");
+                return Failure<bool>("No se pudo registrar la habitación. Verifique datos duplicados o referencias que no existen.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al registrar la habitación.");
+                return Failure<bool>("Ocurrió un error inesperado al registrar la habitación.");
+            }
         }
 
         public async Task<OperationResult<bool>> UpdateAsync(HabitacionUpdate habitacion)
@@ -79,24 +112,37 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (validation is not null)
                 return Failure<bool>(validation);
 
-            var entity = await context.Habitaciones.FirstOrDefaultAsync(h => h.Id == habitacion.Id);
-            if (entity is null)
-                return Failure<bool>("La habitación no existe.");
-
-            entity.Numero = habitacion.Numero!.Trim();
-            entity.IdTipoHabitacion = habitacion.IdTipoHabitacion;
-            entity.PrecioNoche = habitacion.PrecioNoche;
-            entity.Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim();
-            entity.ModifyDate = DateTime.UtcNow;
-            entity.ModifyUser = habitacion.ModifyUser;
-
-            await context.SaveChangesAsync();
-
-            return new OperationResult<bool>
+            try
             {
-                Data = true,
-                Message = "Habitación actualizada correctamente."
-            };
+                var entity = await context.Habitaciones.FirstOrDefaultAsync(h => h.Id == habitacion.Id);
+                if (entity is null)
+                    return Failure<bool>("La habitación no existe.");
+
+                entity.Numero = habitacion.Numero!.Trim();
+                entity.IdTipoHabitacion = habitacion.IdTipoHabitacion;
+                entity.PrecioNoche = habitacion.PrecioNoche;
+                entity.Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim();
+                entity.ModifyDate = DateTime.UtcNow;
+                entity.ModifyUser = habitacion.ModifyUser;
+
+                await context.SaveChangesAsync();
+
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Habitación actualizada correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error de base de datos al actualizar la habitación.");
+                return Failure<bool>("No se pudo actualizar la habitación. Verifique datos duplicados o referencias que no existen.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al actualizar la habitación.");
+                return Failure<bool>("Ocurrió un error inesperado al actualizar la habitación.");
+            }
         }
 
         public async Task<OperationResult<bool>> DeleteAsync(HabitacionRemove habitacion)
@@ -104,18 +150,31 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             if (habitacion is null)
                 return Failure<bool>("El objeto HabitacionRemove es requerido.");
 
-            var entity = await context.Habitaciones.FirstOrDefaultAsync(h => h.Id == habitacion.Id);
-            if (entity is null)
-                return Failure<bool>("La habitación no existe.");
-
-            context.Habitaciones.Remove(entity);
-            await context.SaveChangesAsync();
-
-            return new OperationResult<bool>
+            try
             {
-                Data = true,
-                Message = "Habitación eliminada correctamente."
-            };
+                var entity = await context.Habitaciones.FirstOrDefaultAsync(h => h.Id == habitacion.Id);
+                if (entity is null)
+                    return Failure<bool>("La habitación no existe.");
+
+                context.Habitaciones.Remove(entity);
+                await context.SaveChangesAsync();
+
+                return new OperationResult<bool>
+                {
+                    Data = true,
+                    Message = "Habitación eliminada correctamente."
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError(ex, "Error de base de datos al eliminar la habitación.");
+                return Failure<bool>("No se pudo eliminar la habitación porque tiene registros relacionados.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error inesperado al eliminar la habitación.");
+                return Failure<bool>("Ocurrió un error inesperado al eliminar la habitación.");
+            }
         }
 
         private static string? ValidateHabitacion(HabitacionBase habitacion)

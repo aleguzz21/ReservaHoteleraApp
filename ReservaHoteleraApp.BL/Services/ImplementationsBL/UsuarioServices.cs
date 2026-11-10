@@ -3,37 +3,26 @@ using ReservaHoteleraApp.BL.Services.Base;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Usuario;
-using ReservaHoteleraApp.DAL.Models.Result;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
-
 namespace ReservaHoteleraApp.BL.Services.Implementations
 {
-    public class UsuarioServices : ServiceBase , IUsuarioServices
+    public class UsuarioServices : ServiceBase, IUsuarioServices
     {
         private readonly IUsuarioRepository _repository;
-        
-        public UsuarioServices(IUsuarioRepository repository, ILogger<UsuarioServices> logger) : base(logger)
+
+        public UsuarioServices(IUsuarioRepository repository, ILogger<UsuarioServices> logger)
+            : base(logger)
         {
             _repository = repository;
-           
         }
 
         public Task<OperationResult<List<UsuarioModel>>> GetAllAsync()
         {
             return ExecuteAsync<List<UsuarioModel>>("Consultar usuarios", null, async () =>
             {
-                var result = await _repository.GetAllAsync();
-                if (!result.Success || result.Data is null)
-                    return Failure<List<UsuarioModel>>(result.Message ?? "No fue posible consultar los usuarios.");
-
-                var models = result.Data.Select(MapToModel).ToList();
-                return new OperationResult<List<UsuarioModel>>
-                {
-                    Data = models,
-                    Message = "Usuarios consultados correctamente."
-                };
+                return await _repository.GetAllAsync();
             });
         }
 
@@ -44,11 +33,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (id <= 0)
                     return Failure<UsuarioModel>("El identificador del usuario debe ser mayor que cero.");
 
-                var result = await _repository.GetByIdAsync(id);
-                if (result is null || !result.Success || result.Data is null)
-                    return Failure<UsuarioModel>("El usuario no existe.");
-
-                return result;
+                return await _repository.GetByIdAsync(id);
             });
         }
 
@@ -88,11 +73,12 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             });
         }
 
-        public Task<OperationResult<bool>> DeleteAsync(UsuarioRemove? usuario) {
+        public Task<OperationResult<bool>> DeleteAsync(UsuarioRemove? usuario)
+        {
             return DeleteEntityAsync(usuario, _repository.DeleteAsync, "el usuario");
         }
 
-           private static string? ValidateUsuario(UsuarioBase usuario)
+        private static string? ValidateUsuario(UsuarioBase usuario)
         {
             if (string.IsNullOrWhiteSpace(usuario.NombreUsuario))
                 return "El nombre de usuario es requerido.";
@@ -108,20 +94,6 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "El rol no puede superar los 30 caracteres.";
 
             return null;
-        }
-
-
-
-        private static UsuarioModel MapToModel(Usuario usuario)
-        {
-            return new UsuarioModel
-            {
-                Id = usuario.Id,
-                NombreUsuario = usuario.NombreUsuario,
-                Contrasena = usuario.Contrasena,
-                Rol = usuario.Rol,
-                Activo = usuario.Activo
-            };
         }
     }
 }
