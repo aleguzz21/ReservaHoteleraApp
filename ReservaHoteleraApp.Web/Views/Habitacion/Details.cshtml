@@ -1,0 +1,32 @@
+@* Vista: detalles de una habitación (solo lectura). *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Habitacion.HabitacionModel
+
+@{
+    ViewData["Title"] = "Detalles de la Habitación";
+}
+
+<h1>Detalles de la Habitación</h1>
+<hr />
+<dl class="row">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Id)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Id)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Numero)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Numero)</dd>
+
+    <dt class="col-sm-3">Piso</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.PisoNumero)</dd>
+
+    <dt class="col-sm-3">Tipo de Habitación</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.TipoHabitacionNombre)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.PrecioNoche)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.PrecioNoche)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Estado)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Estado)</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    <a asp-action="Index">Volver a la lista</a>
+</div>

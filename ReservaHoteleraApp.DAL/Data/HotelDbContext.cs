@@ -14,6 +14,10 @@ namespace ReservaHoteleraApp.DAL.Data
         public DbSet<Cliente> Clientes => Set<Cliente>();
         public DbSet<TipoHabitacion> TiposHabitacion => Set<TipoHabitacion>();
         public DbSet<Habitacion> Habitaciones => Set<Habitacion>();
+        public DbSet<Hotel> Hoteles => Set<Hotel>();
+        public DbSet<Bloque> Bloques => Set<Bloque>();
+        public DbSet<Piso> Pisos => Set<Piso>();
+
         public DbSet<Reserva> Reservas => Set<Reserva>();
         public DbSet<Estadia> Estadias => Set<Estadia>();
         public DbSet<Pago> Pagos => Set<Pago>();

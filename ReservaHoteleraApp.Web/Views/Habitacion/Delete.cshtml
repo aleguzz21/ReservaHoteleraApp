@@ -1,0 +1,25 @@
+@* Vista: confirmación para eliminar una habitación. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Habitacion.HabitacionModel
+
+@{
+    ViewData["Title"] = "Eliminar Habitación";
+}
+
+<h1>Eliminar Habitación</h1>
+<h3>¿Seguro que quieres eliminar esta habitación?</h3>
+<hr />
+<dl class="row">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Numero)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Numero)</dd>
+
+    <dt class="col-sm-3">Piso</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.PisoNumero)</dd>
+
+    <dt class="col-sm-3">Tipo de Habitación</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.TipoHabitacionNombre)</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,50 @@
+@* Vista: lista de hoteles.
+   Los mensajes Success/Error llegan desde el controlador por TempData. *@
+@model IEnumerable<ReservaHoteleraApp.DAL.Models.Objects.Hotel.HotelModel>
+
+@{
+    ViewData["Title"] = "Hoteles";
+}
+
+<h1>Gestión de Hoteles</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Hotel</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Nombre)</th>
+            <th>@Html.DisplayNameFor(m => m.Direccion)</th>
+            <th>@Html.DisplayNameFor(m => m.Telefono)</th>
+            <th>@Html.DisplayNameFor(m => m.Ciudad)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(m => item.Nombre)</td>
+            <td>@Html.DisplayFor(m => item.Direccion)</td>
+            <td>@Html.DisplayFor(m => item.Telefono)</td>
+            <td>@Html.DisplayFor(m => item.Ciudad)</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

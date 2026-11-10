@@ -1,0 +1,53 @@
+@* Vista: lista de habitaciones.
+   Muestra el número, el piso (PisoNumero), el tipo (TipoHabitacionNombre),
+   el precio por noche y el estado. *@
+@model IEnumerable<ReservaHoteleraApp.DAL.Models.Objects.Habitacion.HabitacionModel>
+
+@{
+    ViewData["Title"] = "Habitaciones";
+}
+
+<h1>Gestión de Habitaciones</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva Habitación</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Numero)</th>
+            <th>Piso</th>
+            <th>Tipo de Habitación</th>
+            <th>@Html.DisplayNameFor(m => m.PrecioNoche)</th>
+            <th>@Html.DisplayNameFor(m => m.Estado)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(m => item.Numero)</td>
+            <td>@Html.DisplayFor(m => item.PisoNumero)</td>
+            <td>@Html.DisplayFor(m => item.TipoHabitacionNombre)</td>
+            <td>@Html.DisplayFor(m => item.PrecioNoche)</td>
+            <td>@Html.DisplayFor(m => item.Estado)</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

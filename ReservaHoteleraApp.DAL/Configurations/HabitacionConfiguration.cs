@@ -23,7 +23,13 @@ namespace ReservaHoteleraApp.DAL.Configurations
                 .HasMaxLength(20)
                 .HasDefaultValue("Disponible");
 
-            builder.HasIndex(h => h.Numero).IsUnique();
+            builder.HasIndex(h => new { h.IdPiso, h.Numero })
+                .IsUnique();
+
+            builder.HasOne(h => h.Piso)
+                .WithMany(p => p.Habitaciones)
+                .HasForeignKey(h => h.IdPiso)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(h => h.TipoHabitacion)
                 .WithMany(t => t.Habitaciones)

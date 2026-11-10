@@ -1,0 +1,57 @@
+@* Vista: formulario para crear una habitación.
+   Tiene dos desplegables: ViewBag.Pisos (piso) y ViewBag.Tipos (tipo de habitación).
+   El estado se elige de una lista fija: Disponible / Ocupada / Mantenimiento. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Habitacion.HabitacionAdd
+
+@{
+    ViewData["Title"] = "Nueva Habitación";
+}
+
+<h1>Nueva Habitación</h1>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="Numero" class="control-label"></label>
+                <input asp-for="Numero" class="form-control" />
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="IdPiso" class="control-label">Piso</label>
+                <select asp-for="IdPiso" class="form-control" asp-items="ViewBag.Pisos">
+                    <option value="">-- Seleccione un piso --</option>
+                </select>
+                <span asp-validation-for="IdPiso" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="IdTipoHabitacion" class="control-label">Tipo de Habitación</label>
+                <select asp-for="IdTipoHabitacion" class="form-control" asp-items="ViewBag.Tipos">
+                    <option value="">-- Seleccione un tipo --</option>
+                </select>
+                <span asp-validation-for="IdTipoHabitacion" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="PrecioNoche" class="control-label"></label>
+                <input asp-for="PrecioNoche" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="PrecioNoche" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Estado" class="control-label"></label>
+                <select asp-for="Estado" class="form-control">
+                    <option value="Disponible">Disponible</option>
+                    <option value="Ocupada">Ocupada</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,0 +1,23 @@
+@* Vista: confirmación para eliminar un bloque.
+   El formulario envía el id al método POST Delete del controlador. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Bloque.BloqueModel
+
+@{
+    ViewData["Title"] = "Eliminar Bloque";
+}
+
+<h1>Eliminar Bloque</h1>
+<h3>¿Seguro que quieres eliminar este bloque?</h3>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Nombre)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Nombre)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.HotelNombre)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.HotelNombre)</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -8,6 +8,8 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services.Implementations
 {
+    // Servicio de negocio del módulo Tipo de Habitación.
+    // Valida los datos y luego delega el trabajo al repositorio (ITipoHabitacionRepository).
     public class TipoHabitacionServices : ServiceBase, ITipoHabitacionServices
     {
         private readonly ITipoHabitacionRepository _repository;
@@ -78,6 +80,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             return DeleteEntityAsync(tipoHabitacion, _repository.DeleteAsync, "el tipo de habitación");
         }
 
+        // Reglas de negocio del tipo de habitación. Devuelve el mensaje de error, o null si todo está correcto.
         private static string? ValidateTipoHabitacion(TipoHabitacionBase tipoHabitacion)
         {
             if (string.IsNullOrWhiteSpace(tipoHabitacion.Nombre))

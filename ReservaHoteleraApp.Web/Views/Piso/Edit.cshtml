@@ -1,0 +1,41 @@
+@* Vista: formulario para editar un piso.
+   El id va oculto para que el controlador sepa qué piso actualizar. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Piso.PisoUpdate
+
+@{
+    ViewData["Title"] = "Editar Piso";
+}
+
+<h1>Editar Piso</h1>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group mb-3">
+                <label asp-for="Numero" class="control-label"></label>
+                <input asp-for="Numero" class="form-control" type="number" />
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="IdBloque" class="control-label">Bloque</label>
+                <select asp-for="IdBloque" class="form-control" asp-items="ViewBag.Bloques">
+                    <option value="">-- Seleccione un bloque --</option>
+                </select>
+                <span asp-validation-for="IdBloque" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

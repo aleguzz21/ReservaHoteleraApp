@@ -426,3 +426,43 @@ Cuando termines, revisar:
 ## 11. Nota importante
 
 El proyecto ya tiene una base correcta: capas, DTOs, entidades, `OperationResult`, migraciones, DI y pruebas. No hay que rehacerlo. El trabajo principal es blindar los repositorios y, si se decide, mover el mapeo de entidades al DAL para que la BL no dependa de EF.
+
+---
+
+## 12. Estado de avance (09/11/2026)
+
+Trabajo completado y subido a GitHub.
+
+- Repositorio: `https://github.com/aleguzz21/ReservaHoteleraApp`
+- Rama: `master`
+- Commit: `f951206` (`actualizacion`)
+- Verificado: el commit local y `origin/master` son el mismo (`f951206`).
+
+### Checklist final
+
+- [x] Paquete `Microsoft.Extensions.Logging.Abstractions` agregado al DAL.
+- [x] Los 8 repositorios tienen `ILogger`.
+- [x] Los 8 repositorios tienen `try/catch` en `GetAll`, `GetById`, `Add`, `Update` y `Delete`.
+- [x] Se captura `DbUpdateException` (duplicados y FK inexistentes).
+- [x] Se captura `Exception` (conexión caída, timeout, errores inesperados).
+- [x] Todos los caminos devuelven `OperationResult` (sin `throw`).
+- [x] `GetByIdAsync` devuelve `Failure` cuando el registro no existe (ya no `null`).
+- [x] `IRepository` y las 8 interfaces devuelven `XModel` (objetos de negocio), no entidades de EF.
+- [x] El mapeo entidad -> modelo se movió al DAL.
+- [x] La BL ya no usa `Models.Result` (0 ocurrencias).
+- [x] EF (Data, Configurations, Migrations) solo usa `Models.Result` (0 ocurrencias de `Models.Objects`).
+- [x] Pruebas agregadas para casos de fallo (repositorio que devuelve `Failure`).
+- [x] `dotnet build`: 0 errores, 0 advertencias.
+- [x] `dotnet test`: 6 de 6 pruebas correctas.
+
+### Cómo quedaron los comentarios del maestro
+
+1. "Confundió objetos de negocio con modelos de datos": resuelto. EF trabaja solo con `Models.Result` y la BL solo con `Models.Objects`; el repositorio es el traductor.
+2. "La capa de datos no está a prueba de fallo": resuelto. Los 8 repositorios capturan errores y devuelven `Failure` con mensajes claros, registrando el detalle en el log.
+
+### Principios respetados
+
+- Responsabilidad única: repositorio = datos + mapeo; servicio = reglas de negocio.
+- Inversión de dependencias: la BL depende de interfaces (`IXRepository`), no de EF.
+- Interfaz genérica reutilizable: `IRepository<TModel, TAdd, TUpdate, TRemove>`.
+- Una interfaz por entidad (segregación de interfaces).

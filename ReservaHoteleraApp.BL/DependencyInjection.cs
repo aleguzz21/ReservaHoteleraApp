@@ -16,6 +16,9 @@ namespace ReservaHoteleraApp.BL
             services.AddScoped<IEstadiaServices, EstadiaServices>();
             services.AddScoped<IPagoServices, PagoServices>();
             services.AddScoped<IRegistroActividadServices, RegistroActividadServices>();
+            services.AddScoped<IHotelServices, HotelServices>();
+            services.AddScoped<IBloqueServices, BloqueServices>();
+            services.AddScoped<IPisoServices, PisoServices>();
 
             return services;
         }

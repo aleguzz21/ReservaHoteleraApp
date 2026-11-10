@@ -9,6 +9,8 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
 {
+    // Repositorio del módulo Habitación: acceso real a la base de datos.
+    // Una habitación se relaciona con un Piso y con un TipoHabitacion.
     public class HabitacionRepository : IHabitacionRepository
     {
         private readonly HotelDbContext context;
@@ -24,7 +26,9 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
         {
             try
             {
-                var habitaciones = await context.Habitaciones.AsNoTracking().ToListAsync();
+                // Traemos también el Piso y el TipoHabitacion relacionados
+                // para poder mostrar el número de piso y el nombre del tipo en la tabla.
+                var habitaciones = await context.Habitaciones.AsNoTracking().Include(h => h.Piso).Include(h => h.TipoHabitacion).ToListAsync();
                 var models = habitaciones.Select(MapToModel).ToList();
 
                 return new OperationResult<List<HabitacionModel>>
@@ -44,7 +48,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
         {
             try
             {
-                var habitacion = await context.Habitaciones.AsNoTracking().FirstOrDefaultAsync(h => h.Id == id);
+                var habitacion = await context.Habitaciones.AsNoTracking().Include(h => h.Piso).Include(h => h.TipoHabitacion).FirstOrDefaultAsync(h => h.Id == id);
                 if (habitacion is null)
                     return Failure<HabitacionModel>("La habitación no existe.");
 
@@ -75,6 +79,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 var entity = new Habitacion
                 {
                     Numero = habitacion.Numero!.Trim(),
+                    IdPiso = habitacion.IdPiso,
                     IdTipoHabitacion = habitacion.IdTipoHabitacion,
                     PrecioNoche = habitacion.PrecioNoche,
                     Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim(),
@@ -119,6 +124,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                     return Failure<bool>("La habitación no existe.");
 
                 entity.Numero = habitacion.Numero!.Trim();
+                entity.IdPiso = habitacion.IdPiso;
                 entity.IdTipoHabitacion = habitacion.IdTipoHabitacion;
                 entity.PrecioNoche = habitacion.PrecioNoche;
                 entity.Estado = string.IsNullOrWhiteSpace(habitacion.Estado) ? "Disponible" : habitacion.Estado.Trim();
@@ -177,12 +183,15 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             }
         }
 
+        // Reglas mínimas de la habitación. Devuelve el mensaje de error, o null si todo está correcto.
         private static string? ValidateHabitacion(HabitacionBase habitacion)
         {
             if (string.IsNullOrWhiteSpace(habitacion.Numero))
                 return "El número de habitación es requerido.";
             if (habitacion.Numero.Trim().Length > 10)
                 return "El número de habitación no puede superar los 10 caracteres.";
+            if (habitacion.IdPiso <= 0)
+                return "Debe seleccionar un piso.";
             if (habitacion.IdTipoHabitacion <= 0)
                 return "El identificador del tipo de habitación debe ser mayor que cero.";
             if (habitacion.PrecioNoche < 0)
@@ -193,15 +202,20 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             return null;
         }
 
+        // Convierte la entidad (Habitacion) en el modelo de la vista (HabitacionModel),
+        // incluyendo el número de piso y el nombre del tipo ya resueltos.
         private static HabitacionModel MapToModel(Habitacion habitacion)
         {
             return new HabitacionModel
             {
                 Id = habitacion.Id,
                 Numero = habitacion.Numero,
+                IdPiso = habitacion.IdPiso,
                 IdTipoHabitacion = habitacion.IdTipoHabitacion,
                 PrecioNoche = habitacion.PrecioNoche,
-                Estado = habitacion.Estado
+                Estado = habitacion.Estado,
+                PisoNumero = habitacion.Piso?.Numero,
+                TipoHabitacionNombre = habitacion.TipoHabitacion?.Nombre
             };
         }
     }

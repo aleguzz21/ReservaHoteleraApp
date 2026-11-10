@@ -1,0 +1,22 @@
+@* Vista: confirmación para eliminar un piso. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Piso.PisoModel
+
+@{
+    ViewData["Title"] = "Eliminar Piso";
+}
+
+<h1>Eliminar Piso</h1>
+<h3>¿Seguro que quieres eliminar este piso?</h3>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Numero)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Numero)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.BloqueNombre)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.BloqueNombre)</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

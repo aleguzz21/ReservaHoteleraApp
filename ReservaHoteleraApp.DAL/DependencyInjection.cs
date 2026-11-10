@@ -26,7 +26,9 @@ namespace ReservaHoteleraApp.DAL
             services.AddScoped<IEstadiaRepository, EstadiaRepository>();
             services.AddScoped<IPagoRepository, PagoRepository>();
             services.AddScoped<IRegistroActividadRepository, RegistroActividadRepository>();
-
+            services.AddScoped<IHotelRepository, HotelRepository>();
+            services.AddScoped<IBloqueRepository, BloqueRepository>();
+            services.AddScoped<IPisoRepository, PisoRepository>();
             return services;
         }
     }

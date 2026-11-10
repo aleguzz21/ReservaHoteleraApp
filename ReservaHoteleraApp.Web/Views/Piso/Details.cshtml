@@ -1,0 +1,26 @@
+@* Vista: detalles de un piso (solo lectura). *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Piso.PisoModel
+
+@{
+    ViewData["Title"] = "Detalles del Piso";
+}
+
+<h1>Detalles del Piso</h1>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Id)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Id)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Numero)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Numero)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.BloqueNombre)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.BloqueNombre)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Descripcion)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Descripcion)</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    <a asp-action="Index">Volver a la lista</a>
+</div>

@@ -8,6 +8,8 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services.Implementations
 {
+    // Servicio de negocio del módulo Habitación.
+    // Valida los datos y luego delega el trabajo al repositorio (IHabitacionRepository).
     public class HabitacionServices : ServiceBase, IHabitacionServices
     {
         private readonly IHabitacionRepository _repository;
@@ -78,12 +80,15 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             return DeleteEntityAsync(habitacion, _repository.DeleteAsync, "la habitación");
         }
 
+        // Reglas de negocio de la habitación. Devuelve el mensaje de error, o null si todo está correcto.
         private static string? ValidateHabitacion(HabitacionBase habitacion)
         {
             if (string.IsNullOrWhiteSpace(habitacion.Numero))
                 return "El número de habitación es requerido.";
             if (habitacion.Numero.Trim().Length > 10)
                 return "El número de habitación no puede superar los 10 caracteres.";
+            if (habitacion.IdPiso <= 0)
+                return "Debe seleccionar un piso.";
             if (habitacion.IdTipoHabitacion <= 0)
                 return "El identificador del tipo de habitación debe ser mayor que cero.";
             if (habitacion.PrecioNoche < 0)

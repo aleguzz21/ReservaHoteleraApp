@@ -9,6 +9,8 @@ using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
 {
+    // Repositorio del módulo Tipo de Habitación: acceso real a la base de datos.
+    // Es un catálogo simple (no depende de otras tablas).
     public class TipoHabitacionRepository : ITipoHabitacionRepository
     {
         private readonly HotelDbContext context;
@@ -24,6 +26,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
         {
             try
             {
+                // AsNoTracking = consulta de solo lectura (más rápida).
                 var tipos = await context.TiposHabitacion.AsNoTracking().ToListAsync();
                 var models = tipos.Select(MapToModel).ToList();
 
@@ -177,6 +180,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             }
         }
 
+        // Reglas mínimas del tipo de habitación. Devuelve el mensaje de error, o null si todo está correcto.
         private static string? ValidateTipoHabitacion(TipoHabitacionBase tipoHabitacion)
         {
             if (string.IsNullOrWhiteSpace(tipoHabitacion.Nombre))
@@ -193,6 +197,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             return null;
         }
 
+        // Convierte la entidad (TipoHabitacion) en el modelo de la vista (TipoHabitacionModel).
         private static TipoHabitacionModel MapToModel(TipoHabitacion tipoHabitacion)
         {
             return new TipoHabitacionModel

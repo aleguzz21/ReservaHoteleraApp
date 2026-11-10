@@ -1,0 +1,22 @@
+@* Vista: confirmación para eliminar un hotel. *@
+@model ReservaHoteleraApp.DAL.Models.Objects.Hotel.HotelModel
+
+@{
+    ViewData["Title"] = "Eliminar Hotel";
+}
+
+<h1>Eliminar Hotel</h1>
+<h3>¿Seguro que quieres eliminar este hotel?</h3>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Nombre)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Nombre)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Ciudad)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(m => m.Ciudad)</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
