@@ -31,6 +31,58 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             });
         }
 
+        // Regla de negocio: buscar hoteles por destino.
+        // Revisa si el destino aparece en el nombre, la ciudad o la dirección.
+        public Task<OperationResult<List<HotelModel>>> BuscarAsync(string? destino)
+        {
+            return ExecuteAsync<List<HotelModel>>("Buscar hoteles", null, async () =>
+            {
+                var resultado = await _repository.GetAllAsync();
+
+                if (resultado.Success == false)
+                {
+                    return Failure<List<HotelModel>>(resultado.Message ?? "No fue posible consultar los hoteles.");
+                }
+
+                var hoteles = resultado.Data ?? new List<HotelModel>();
+
+                // Si no escribieron destino, devolvemos todos los hoteles.
+                if (string.IsNullOrWhiteSpace(destino))
+                {
+                    return new OperationResult<List<HotelModel>> { Data = hoteles };
+                }
+
+                string busqueda = destino.Trim();
+                var hotelesFiltrados = new List<HotelModel>();
+
+                foreach (var hotel in hoteles)
+                {
+                    bool coincideNombre = ContieneTexto(hotel.Nombre, busqueda);
+                    bool coincideCiudad = ContieneTexto(hotel.Ciudad, busqueda);
+                    bool coincideDireccion = ContieneTexto(hotel.Direccion, busqueda);
+
+                    if (coincideNombre || coincideCiudad || coincideDireccion)
+                    {
+                        hotelesFiltrados.Add(hotel);
+                    }
+                }
+
+                return new OperationResult<List<HotelModel>> { Data = hotelesFiltrados };
+            });
+        }
+
+        // Método auxiliar: dice si un texto contiene la palabra buscada.
+        // No importan las mayúsculas ni minúsculas.
+        private static bool ContieneTexto(string? texto, string busqueda)
+        {
+            if (string.IsNullOrEmpty(texto))
+            {
+                return false;
+            }
+
+            return texto.ToLower().Contains(busqueda.ToLower());
+        }
+
         public Task<OperationResult<HotelModel>> GetByIdAsync(int id)
         {
             return ExecuteAsync<HotelModel>("Consultar hotel", null, async () =>

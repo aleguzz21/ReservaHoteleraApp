@@ -22,6 +22,48 @@ namespace ReservaHoteleraApp.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Bloque", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int?>("CreatedUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("IdHotel")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifyUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdHotel", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Bloques", (string)null);
+                });
+
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Cliente", b =>
                 {
                     b.Property<int>("Id")
@@ -147,6 +189,9 @@ namespace ReservaHoteleraApp.DAL.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("Disponible");
 
+                    b.Property<int>("IdPiso")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdTipoHabitacion")
                         .HasColumnType("int");
 
@@ -169,10 +214,57 @@ namespace ReservaHoteleraApp.DAL.Migrations
 
                     b.HasIndex("IdTipoHabitacion");
 
-                    b.HasIndex("Numero")
+                    b.HasIndex("IdPiso", "Numero")
                         .IsUnique();
 
                     b.ToTable("Habitaciones", (string)null);
+                });
+
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Hotel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Ciudad")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int?>("CreatedUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Direccion")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifyUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Telefono")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Hoteles", (string)null);
                 });
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Pago", b =>
@@ -217,6 +309,46 @@ namespace ReservaHoteleraApp.DAL.Migrations
                     b.HasIndex("IdReserva");
 
                     b.ToTable("Pagos", (string)null);
+                });
+
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Piso", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int?>("CreatedUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("IdBloque")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifyUser")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBloque", "Numero")
+                        .IsUnique();
+
+                    b.ToTable("Pisos", (string)null);
                 });
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.RegistroActividad", b =>
@@ -412,6 +544,17 @@ namespace ReservaHoteleraApp.DAL.Migrations
                     b.ToTable("Usuarios", (string)null);
                 });
 
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Bloque", b =>
+                {
+                    b.HasOne("ReservaHoteleraApp.DAL.Models.Result.Hotel", "Hotel")
+                        .WithMany("Bloques")
+                        .HasForeignKey("IdHotel")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Cliente", b =>
                 {
                     b.HasOne("ReservaHoteleraApp.DAL.Models.Result.Usuario", "Usuario")
@@ -444,11 +587,19 @@ namespace ReservaHoteleraApp.DAL.Migrations
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Habitacion", b =>
                 {
+                    b.HasOne("ReservaHoteleraApp.DAL.Models.Result.Piso", "Piso")
+                        .WithMany("Habitaciones")
+                        .HasForeignKey("IdPiso")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ReservaHoteleraApp.DAL.Models.Result.TipoHabitacion", "TipoHabitacion")
                         .WithMany("Habitaciones")
                         .HasForeignKey("IdTipoHabitacion")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Piso");
 
                     b.Navigation("TipoHabitacion");
                 });
@@ -462,6 +613,17 @@ namespace ReservaHoteleraApp.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Reserva");
+                });
+
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Piso", b =>
+                {
+                    b.HasOne("ReservaHoteleraApp.DAL.Models.Result.Bloque", "Bloque")
+                        .WithMany("Pisos")
+                        .HasForeignKey("IdBloque")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Bloque");
                 });
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.RegistroActividad", b =>
@@ -494,6 +656,11 @@ namespace ReservaHoteleraApp.DAL.Migrations
                     b.Navigation("Habitacion");
                 });
 
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Bloque", b =>
+                {
+                    b.Navigation("Pisos");
+                });
+
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Cliente", b =>
                 {
                     b.Navigation("Reservas");
@@ -502,6 +669,16 @@ namespace ReservaHoteleraApp.DAL.Migrations
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Habitacion", b =>
                 {
                     b.Navigation("Reservas");
+                });
+
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Hotel", b =>
+                {
+                    b.Navigation("Bloques");
+                });
+
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Piso", b =>
+                {
+                    b.Navigation("Habitaciones");
                 });
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Reserva", b =>

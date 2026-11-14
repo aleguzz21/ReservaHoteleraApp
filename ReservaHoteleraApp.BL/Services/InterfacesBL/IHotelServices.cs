@@ -9,6 +9,7 @@ namespace ReservaHoteleraApp.BL.Services.Interfaces
     public interface IHotelServices
     {
         Task<OperationResult<List<HotelModel>>> GetAllAsync();
+        Task<OperationResult<List<HotelModel>>> BuscarAsync(string? destino);
         Task<OperationResult<HotelModel>> GetByIdAsync(int id);
         Task<OperationResult<bool>> AddAsync(HotelAdd? hotel);
         Task<OperationResult<bool>> UpdateAsync(HotelUpdate? hotel);

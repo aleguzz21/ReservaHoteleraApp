@@ -1,8 +1,180 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<ReservaHoteleraApp.DAL.Models.Objects.Hotel.HotelModel>
+@using ReservaHoteleraApp.DAL.Models.Objects.Hotel
+
+@{
+    ViewData["Title"] = "Inicio";
+    var entrada = ViewData["FechaEntrada"] as DateTime?;
+    var salida = ViewData["FechaSalida"] as DateTime?;
+
+    // Fecha de hoy en formato yyyy-MM-dd (el que entiende <input type="date">).
+    var hoy = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="booking-hero">
+    <div class="booking-hero-container">
+        <div class="booking-hero-text">
+            <h1 class="booking-hero-title">Encuentra tu próxima estancia</h1>
+            <p class="booking-hero-subtitle">Busca ofertas en los hoteles mejores valorados</p>
+        </div>
+
+        <form class="booking-search" method="get" asp-controller="Hotel" asp-action="Index">
+            <div class="booking-search-field booking-search-destination">
+                <span class="booking-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 5v14M3 12h18v7M7 12V8h6v4" />
+                        <path d="M17 12V9h4v3" />
+                    </svg>
+                </span>
+                <div class="booking-search-body">
+                    <label for="destino">Indica el destino</label>
+                    <input id="destino" name="destino" type="text" placeholder="¿Adónde vas?" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="booking-search-field booking-search-dates">
+                <span class="booking-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="17" rx="2" />
+                        <path d="M3 9h18M8 2v4M16 2v4" />
+                    </svg>
+                </span>
+                <div class="booking-search-body">
+                    <label>Seleccionar fechas</label>
+                    <div class="booking-dates-row">
+                        <input id="fechaEntrada" type="date" name="fechaEntrada" aria-label="Fecha de entrada"
+                               min="@hoy" value="@(entrada?.ToString("yyyy-MM-dd"))" />
+                        <span class="booking-dates-sep">—</span>
+                        <input id="fechaSalida" type="date" name="fechaSalida" aria-label="Fecha de salida"
+                               min="@hoy" value="@(salida?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-search-field booking-search-occupancy">
+                <span class="booking-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+                    </svg>
+                </span>
+                <div class="booking-search-body">
+                    <label>Selecciona la ocupación</label>
+                    <div class="booking-occupancy-row">
+                        <select name="adultos" aria-label="Adultos">
+                            <option value="1">1 adulto</option>
+                            <option value="2" selected>2 adultos</option>
+                            <option value="3">3 adultos</option>
+                            <option value="4">4 adultos</option>
+                        </select>
+                        <select name="ninos" aria-label="Niños">
+                            <option value="0" selected>0 niños</option>
+                            <option value="1">1 niño</option>
+                            <option value="2">2 niños</option>
+                            <option value="3">3 niños</option>
+                        </select>
+                        <select name="habitaciones" aria-label="Habitaciones">
+                            <option value="1" selected>1 habitación</option>
+                            <option value="2">2 habitaciones</option>
+                            <option value="3">3 habitaciones</option>
+                            <option value="4">4 habitaciones</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="booking-search-btn">Buscar</button>
+        </form>
+
+        <label class="booking-work-check">
+            <input type="checkbox" /> Viajo por trabajo
+        </label>
+    </div>
+</section>
+
+<section class="booking-why">
+    <h2 class="booking-section-title">¿Por qué elegir A&amp;V Solutions?</h2>
+    <div class="booking-why-grid">
+        <article class="booking-why-card">
+            <span class="booking-why-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12l5 5L20 6" />
+                </svg>
+            </span>
+            <h3>Reserva fácil y rápido</h3>
+            <p>Encuentra y compara hoteles disponibles en tu destino en pocos pasos.</p>
+        </article>
+        <article class="booking-why-card">
+            <span class="booking-why-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />
+                </svg>
+            </span>
+            <h3>Opciones para todos</h3>
+            <p>Hoteles, bloques, pisos y habitaciones adaptados a lo que necesitas.</p>
+        </article>
+        <article class="booking-why-card">
+            <span class="booking-why-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                </svg>
+            </span>
+            <h3>Información actualizada</h3>
+            <p>Datos administrados directamente por el equipo de A&amp;V Solutions.</p>
+        </article>
+        <article class="booking-why-card">
+            <span class="booking-why-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M6 21V10l6-5 6 5v11M10 21v-5h4v5" />
+                </svg>
+            </span>
+            <h3>Alojamientos de confianza</h3>
+            <p>Consulta detalles, dirección y contacto de cada alojamiento disponible.</p>
+        </article>
+    </div>
+</section>
+
+<section class="booking-hotels">
+    <div class="booking-hotels-head">
+        <h2 class="booking-section-title">Alojamientos disponibles</h2>
+        <a class="booking-link-all" asp-controller="Hotel" asp-action="Index">Ver todos</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p class="booking-empty">Todavía no hay alojamientos registrados.</p>
+    }
+    else
+    {
+        <div class="booking-hotels-grid">
+            @foreach (var hotel in Model)
+            {
+                <article class="booking-hotel-card">
+                    <div class="booking-hotel-media" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 5v14M3 12h18v7M7 12V8h6v4M17 12V9h4v3" />
+                        </svg>
+                    </div>
+                    <div class="booking-hotel-body">
+                        <h3 class="booking-hotel-name">@hotel.Nombre</h3>
+                        <p class="booking-hotel-location">
+                            @if (!string.IsNullOrWhiteSpace(hotel.Ciudad))
+                            {
+                                <span>@hotel.Ciudad</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(hotel.Direccion))
+                            {
+                                <span class="booking-hotel-address">@hotel.Direccion</span>
+                            }
+                        </p>
+                        @if (!string.IsNullOrWhiteSpace(hotel.Telefono))
+                        {
+                            <p class="booking-hotel-phone">Tel. @hotel.Telefono</p>
+                        }
+                        <a class="booking-hotel-cta" asp-controller="Hotel" asp-action="Details" asp-route-id="@hotel.Id">Ver detalles</a>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>
