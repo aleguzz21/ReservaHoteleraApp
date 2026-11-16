@@ -60,6 +60,25 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 return Failure<UsuarioModel>("No se pudo consultar el usuario.");
             }
         }
+        public async Task<OperationResult<UsuarioModel>> GetByNombreUsuarioAsync(string nombreUsuario)
+        {
+            try
+            {
+                var usuario = await context.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
+                if (usuario is null)
+                    return Failure<UsuarioModel>("El usuario no existe.");
+                return new OperationResult<UsuarioModel>
+                {
+                    Data = MapToModel(usuario),
+                    Message = "Usuario consultado correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar el usuario con nombre de usuario {NombreUsuario}.", nombreUsuario);
+                return Failure<UsuarioModel>("No se pudo consultar el usuario.");
+            }
+        }
 
         public async Task<OperationResult<bool>> AddAsync(UsuarioAdd usuario)
         {

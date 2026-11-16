@@ -85,9 +85,9 @@
             <button type="submit" class="booking-search-btn">Buscar</button>
         </form>
 
-        <label class="booking-work-check">
+        @*<label class="booking-work-check">
             <input type="checkbox" /> Viajo por trabajo
-        </label>
+        </label>*@
     </div>
 </section>
 
@@ -137,7 +137,7 @@
 <section class="booking-hotels">
     <div class="booking-hotels-head">
         <h2 class="booking-section-title">Alojamientos disponibles</h2>
-        <a class="booking-link-all" asp-controller="Hotel" asp-action="Index">Ver todos</a>
+     @* <a class="booking-link-all" asp-controller="Hotel" asp-action="Index">Ver todos</a>*@
     </div>
 
     @if (!Model.Any())

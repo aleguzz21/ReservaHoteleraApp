@@ -81,7 +81,7 @@ body {
   flex-wrap: wrap;
 }
 
-.booking-currency {
+/*.booking-currency {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,7 +96,7 @@ body {
   border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, .5);
   background: linear-gradient(to bottom, #002d62 0 33%, #fff 33% 66%, #ce1126 66% 100%);
-}
+}*/
 
 .booking-link-light {
   color: #fff;

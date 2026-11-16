@@ -4,6 +4,8 @@ using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models;
 using ReservaHoteleraApp.DAL.Models.Objects.Usuario;
 using ReservaHoteleraApp.DAL.Repositories.InterfacesDAL;
+using Microsoft.AspNetCore.Identity;
+using ReservaHoteleraApp.DAL.Models.Result;
 using static ReservaHoteleraApp.DAL.Models.OperationResult;
 
 namespace ReservaHoteleraApp.BL.Services.Implementations
@@ -11,7 +13,8 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
     public class UsuarioServices : ServiceBase, IUsuarioServices
     {
         private readonly IUsuarioRepository _repository;
-
+        private readonly PasswordHasher<Usuario> _passwordHasher = new();
+       
         public UsuarioServices(IUsuarioRepository repository, ILogger<UsuarioServices> logger)
             : base(logger)
         {
@@ -48,10 +51,48 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 if (validation is not null)
                     return Failure<bool>(validation);
 
+                usuario.Contrasena = _passwordHasher.HashPassword(new Usuario(), usuario.Contrasena!);
+
                 var result = await _repository.AddAsync(usuario);
                 return result.Success && result.Data
                     ? new OperationResult<bool> { Data = true, Message = "Usuario registrado correctamente." }
                     : Failure<bool>(result.Message ?? "No fue posible registrar el usuario.");
+            });
+        }
+        public Task<OperationResult<UsuarioModel>> GetByNombreUsuarioAsync(string nombreUsuario) { 
+            return ExecuteAsync<UsuarioModel>("Consultar usuario por nombre de usuario", null, async () =>
+            {
+                if (string.IsNullOrWhiteSpace(nombreUsuario))
+                    return Failure<UsuarioModel>("El nombre de usuario es requerido.");
+                return await _repository.GetByNombreUsuarioAsync(nombreUsuario.Trim());
+            });
+        }
+        public Task<OperationResult<UsuarioModel>> ValidarCredencialesAsync(string nombreUsuario, string contrasena)
+        {
+            return ExecuteAsync<UsuarioModel>("Validar credenciales de usuario", null, async () =>
+            {
+                if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contrasena))
+                    return Failure<UsuarioModel>("El nombre de usuario y la contrasena es requerido.");
+               
+                var resultado = await _repository.GetByNombreUsuarioAsync(nombreUsuario.Trim());
+
+                if (!resultado.Success || resultado.Data is null)
+                    return Failure<UsuarioModel>("Usuario o contrasena incorrectos");
+
+                var usuario = resultado.Data;
+                var verificacion = _passwordHasher.VerifyHashedPassword(new Usuario(), usuario.Contrasena!, contrasena);
+
+                if (verificacion == PasswordVerificationResult.Failed)
+                    return Failure<UsuarioModel>("Usuario o contrasena incorrectos");
+
+                if (!usuario.Activo)
+                    return Failure<UsuarioModel>("El usuario está inactivo.");
+
+                return new OperationResult<UsuarioModel>
+                {
+                    Data = usuario,
+                    Message = "Credenciales validadas correctamente."
+                };
             });
         }
 
@@ -72,6 +113,7 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                     : Failure<bool>(result.Message ?? "No fue posible actualizar el usuario.");
             });
         }
+        
 
         public Task<OperationResult<bool>> DeleteAsync(UsuarioRemove? usuario)
         {

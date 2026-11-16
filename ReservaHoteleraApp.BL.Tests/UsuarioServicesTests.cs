@@ -84,6 +84,10 @@ public class UsuarioServicesTests
         {
             return Task.FromResult(OperationResult.Success(true));
         }
+        public Task<OperationResult<UsuarioModel>> GetByNombreUsuarioAsync(string nombreUsuario)
+        {
+            return Task.FromResult(OperationResult.Failure<UsuarioModel>("El usuario no existe."));
+        }
     }
 
     private sealed class FailingUsuarioRepository : IUsuarioRepository
@@ -111,6 +115,10 @@ public class UsuarioServicesTests
         public Task<OperationResult<bool>> DeleteAsync(UsuarioRemove usuario)
         {
             return Task.FromResult(OperationResult.Failure<bool>("No se pudo eliminar el usuario."));
+        }
+        public Task<OperationResult<UsuarioModel>> GetByNombreUsuarioAsync(string nombreUsuario)
+        {
+            return Task.FromResult(OperationResult.Failure<UsuarioModel>("El usuario no existe."));
         }
     }
 }

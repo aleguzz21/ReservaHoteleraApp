@@ -11,7 +11,7 @@
 
     // Si los campos no existen en esta página, no hacemos nada.
     if (!fechaEntrada || !fechaSalida) {
-        return;
+        return MessageEvent("No hay cambios agregados");
     }
 
     function actualizarFechaSalida() {
