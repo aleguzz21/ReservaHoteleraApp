@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ReservaHoteleraApp.BL.Services.Interfaces;
+using ReservaHoteleraApp.DAL.Models.Objects.Habitacion;
 using ReservaHoteleraApp.DAL.Models.Objects.Hotel;
 using ReservaHoteleraApp.Web.Models;
 using System.Diagnostics;
@@ -7,41 +8,67 @@ using System.Diagnostics;
 namespace ReservaHoteleraApp.Web.Controllers
 {
     // Controlador de la página de inicio (Home).
-    // Su trabajo es cargar algunos hoteles y mostrarlos en la página principal.
+    // Muestra los hoteles y permite buscar habitaciones disponibles por hotel y fechas.
     public class HomeController : Controller
     {
-        // Servicio de negocio de los hoteles.
-        // Lo usamos para pedir la lista de hoteles sin tocar la base de datos.
+        // Servicios de negocio: hoteles y habitaciones (sin tocar la base de datos aquí).
         private readonly IHotelServices _hotelServices;
+        private readonly IHabitacionServices _habitacionServices;
 
-        // ASP.NET Core nos entrega el servicio ya creado (inyección de dependencias).
-        public HomeController(IHotelServices hotelServices)
+        public HomeController(IHotelServices hotelServices, IHabitacionServices habitacionServices)
         {
             _hotelServices = hotelServices;
+            _habitacionServices = habitacionServices;
         }
 
         // GET: /Home
-        // Muestra la página de inicio con el buscador y la lista de hoteles.
-        public async Task<IActionResult> Index()
+        // Si llega hotelId o fechas, además de los hoteles devuelve las habitaciones libres.
+        public async Task<IActionResult> Index(int? hotelId, string? fechaEntrada, string? fechaSalida)
         {
-            // 1. Pedimos todos los hoteles al servicio.
             var respuesta = await _hotelServices.GetAllAsync();
-
-            // 2. Si hubo un error, guardamos el mensaje para mostrarlo en la vista.
-            if (respuesta.Success == false)
-            {
+            if (!respuesta.Success)
                 TempData["Error"] = respuesta.Message;
-            }
 
-            // 3. Obtenemos la lista de hoteles.
-            //    Si viene vacía, creamos una lista vacía para que la vista no falle.
-            var hoteles = respuesta.Data;
-            if (hoteles == null)
+            var hoteles = respuesta.Data ?? new List<HotelModel>();
+
+            ViewBag.HotelId = hotelId;
+            ViewBag.Buscando = false;
+            ViewBag.Habitaciones = new List<HabitacionModel>();
+
+            var quiereBuscar = hotelId.HasValue
+                || !string.IsNullOrWhiteSpace(fechaEntrada)
+                || !string.IsNullOrWhiteSpace(fechaSalida);
+
+            if (quiereBuscar)
             {
-                hoteles = new List<HotelModel>();
+                // Fechas: si no llegan o son inválidas, se usa hoy → mañana.
+                DateTime entrada;
+                if (!DateTime.TryParse(fechaEntrada, out entrada) || entrada < DateTime.Today)
+                    entrada = DateTime.Today;
+
+                DateTime salida;
+                if (!DateTime.TryParse(fechaSalida, out salida) || salida <= entrada)
+                    salida = entrada.AddDays(1);
+
+                ViewBag.FechaEntrada = entrada;
+                ViewBag.FechaSalida = salida;
+
+                var disponibles = await _habitacionServices.GetDisponiblesAsync(entrada, salida);
+                if (!disponibles.Success)
+                {
+                    TempData["Error"] = disponibles.Message;
+                }
+                else
+                {
+                    var lista = disponibles.Data ?? new List<HabitacionModel>();
+                    if (hotelId.HasValue)
+                        lista = lista.Where(h => h.IdHotel == hotelId.Value).ToList();
+
+                    ViewBag.Habitaciones = lista;
+                    ViewBag.Buscando = true;
+                }
             }
 
-            // 4. Enviamos la lista a la vista Views/Home/Index.cshtml.
             return View(hoteles);
         }
 

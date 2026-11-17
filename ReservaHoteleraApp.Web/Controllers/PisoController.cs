@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ReservaHoteleraApp.BL.Services.Interfaces;
@@ -8,6 +9,7 @@ namespace ReservaHoteleraApp.Web.Controllers
     // Controlador del módulo "Pisos".
     // Un piso pertenece a un bloque, por eso usamos IBloqueServices
     // para llenar el desplegable de bloques.
+    [Authorize(Roles ="Administrador")]
     public class PisoController : Controller
     {
         private readonly IPisoServices _pisoServices;

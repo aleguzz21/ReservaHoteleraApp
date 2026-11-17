@@ -37,6 +37,16 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             });
         }
 
+        public Task<OperationResult<ClienteModel>> GetByUsuarioIdAsync(int idUsuario)
+        {
+            return ExecuteAsync<ClienteModel>("Consultar cliente por usuario", null, async () =>
+            {
+                if (idUsuario <= 0)
+                    return Failure<ClienteModel>("El identificador del usuario debe ser mayor que cero.");
+                return await _repository.GetByUsuarioIdAsync(idUsuario);
+            });
+         }
+
         public Task<OperationResult<bool>> AddAsync(ClienteAdd? cliente)
         {
             return ExecuteAsync<bool>("Registrar cliente", cliente?.CreatedUser, async () =>

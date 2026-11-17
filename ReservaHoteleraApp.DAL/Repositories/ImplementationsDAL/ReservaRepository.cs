@@ -61,6 +61,104 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             }
         }
 
+        public async Task<OperationResult<bool>> EstaDisponibleAsync(int idHabitacion, DateTime fechaEntrada, DateTime fechaSalida)
+        {
+            try
+            {
+                var ocupada = await context.Reservas.AsNoTracking().AnyAsync(r =>
+                    r.IdHabitacion == idHabitacion &&
+                    r.Estado != "Cancelada" &&
+                    r.FechaEntrada < fechaSalida &&
+                    (r.FechaSalida == null || r.FechaSalida > fechaEntrada));
+
+                return new OperationResult<bool>
+                {
+                    Data = !ocupada,
+                    Message = ocupada
+                        ? "La habitación no está disponible en esas fechas."
+                        : "La habitación está disponible."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al verificar disponibilidad de la habitación {IdHabitacion}.", idHabitacion);
+                return Failure<bool>("No se pudo verificar la disponibilidad.");
+            }
+        }
+        public async Task<OperationResult<List<ReservaDetalleModel>>> GetByClienteIdAsync(int idCliente)
+        {
+            try
+            {
+                var reservas = await ConsultaDetalle()
+                    .Where(r => r.IdCliente == idCliente)
+                    .OrderByDescending(r => r.Id)
+                    .ToListAsync();
+
+                return new OperationResult<List<ReservaDetalleModel>>
+                {
+                    Data = reservas.Select(MapToDetalle).ToList(),
+                    Message = "Reservas consultadas correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar las reservas del cliente {IdCliente}.", idCliente);
+                return Failure<List<ReservaDetalleModel>>("No se pudieron consultar las reservas.");
+            }
+        }
+
+        public async Task<OperationResult<List<ReservaDetalleModel>>> GetAllConDetalleAsync()
+        {
+            try
+            {
+                var reservas = await ConsultaDetalle()
+                    .OrderByDescending(r => r.Id)
+                    .ToListAsync();
+
+                return new OperationResult<List<ReservaDetalleModel>>
+                {
+                    Data = reservas.Select(MapToDetalle).ToList(),
+                    Message = "Reservas consultadas correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar todas las reservas con detalle.");
+                return Failure<List<ReservaDetalleModel>>("No se pudieron consultar las reservas.");
+            }
+        }
+
+        private IQueryable<Reserva> ConsultaDetalle()
+        {
+            return context.Reservas.AsNoTracking()
+                .Include(r => r.Cliente)
+                .Include(r => r.Habitacion!.Piso!.Bloque!.Hotel)
+                .Include(r => r.Habitacion!.TipoHabitacion);
+        }
+
+        private static ReservaDetalleModel MapToDetalle(Reserva reserva)
+        {
+            return new ReservaDetalleModel
+            {
+                Id = reserva.Id,
+                IdCliente = reserva.IdCliente,
+                IdHabitacion = reserva.IdHabitacion,
+                CantidadPersonas = reserva.CantidadPersonas,
+                Estado = reserva.Estado,
+                TotalReserva = reserva.TotalReserva,
+                FechaEntrada = reserva.FechaEntrada,
+                FechaSalida = reserva.FechaSalida,
+                ClienteNombre = reserva.Cliente?.NombreCliente,
+                NumeroHabitacion = reserva.Habitacion?.Numero,
+                PrecioNoche = reserva.Habitacion?.PrecioNoche ?? 0m,
+                PisoNumero = reserva.Habitacion?.Piso?.Numero,
+                BloqueNombre = reserva.Habitacion?.Piso?.Bloque?.Nombre,
+                HotelNombre = reserva.Habitacion?.Piso?.Bloque?.Hotel?.Nombre,
+                Ciudad = reserva.Habitacion?.Piso?.Bloque?.Hotel?.Ciudad,
+                TipoHabitacionNombre = reserva.Habitacion?.TipoHabitacion?.Nombre
+            };
+        }
+
         public async Task<OperationResult<bool>> AddAsync(ReservaAdd reserva)
         {
             if (reserva is null)

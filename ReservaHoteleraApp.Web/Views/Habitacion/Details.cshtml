@@ -14,6 +14,18 @@
     <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Numero)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(m => m.Numero)</dd>
 
+    <dt class="col-sm-3">Hotel</dt>
+    <dd class="col-sm-9">
+        @Html.DisplayFor(m => m.HotelNombre)
+        @if (!string.IsNullOrWhiteSpace(Model.Ciudad))
+        {
+            <text> · </text>@Html.DisplayFor(m => m.Ciudad)
+        }
+    </dd>
+
+    <dt class="col-sm-3">Bloque</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.BloqueNombre)</dd>
+
     <dt class="col-sm-3">Piso</dt>
     <dd class="col-sm-9">@Html.DisplayFor(m => m.PisoNumero)</dd>
 
@@ -27,6 +39,17 @@
     <dd class="col-sm-9">@Html.DisplayFor(m => m.Estado)</dd>
 </dl>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a class="btn btn-primary"
+           asp-controller="Reserva" asp-action="Create"
+           asp-route-habitacionId="@Model.Id">Reservar</a>
+    }
+
+    @if (User.IsInRole("Administrador"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> <text>|</text>
+    }
+
     <a asp-action="Index">Volver a la lista</a>
 </div>

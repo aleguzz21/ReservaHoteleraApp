@@ -36,6 +36,75 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return await _repository.GetByIdAsync(id);
             });
         }
+        public Task<OperationResult<bool>> EstaDisponibleAsync(int idHabitacion, DateTime fechaEntrada, DateTime fechaSalida)
+        {
+            return ExecuteAsync<bool>("Verificar disponibilidad", null, async () =>
+            {
+                if (idHabitacion <= 0)
+                    return Failure<bool>("El identificador de la habitación debe ser mayor que cero.");
+                if (fechaEntrada < DateTime.Today)
+                    return Failure<bool>("La fecha de entrada no puede ser anterior a hoy.");
+                if (fechaSalida <= fechaEntrada)
+                    return Failure<bool>("La fecha de salida debe ser posterior a la fecha de entrada.");
+
+                return await _repository.EstaDisponibleAsync(idHabitacion, fechaEntrada, fechaSalida);
+            });
+        }
+
+        public Task<OperationResult<List<ReservaDetalleModel>>> GetByClienteIdAsync(int idCliente)
+        {
+            return ExecuteAsync<List<ReservaDetalleModel>>("Consultar reservas del cliente", null, async () =>
+            {
+                if (idCliente <= 0)
+                    return Failure<List<ReservaDetalleModel>>("El identificador del cliente debe ser mayor que cero.");
+
+                return await _repository.GetByClienteIdAsync(idCliente);
+            });
+        }
+
+        public Task<OperationResult<List<ReservaDetalleModel>>> GetAllConDetalleAsync()
+        {
+            return ExecuteAsync<List<ReservaDetalleModel>>("Consultar todas las reservas", null, async () =>
+            {
+                return await _repository.GetAllConDetalleAsync();
+            });
+        }
+
+        public Task<OperationResult<bool>> CancelarAsync(int idReserva, int idCliente, bool esAdministrador)
+        {
+            return ExecuteAsync<bool>("Cancelar reserva", null, async () =>
+            {
+                if (idReserva <= 0)
+                    return Failure<bool>("El identificador de la reserva debe ser mayor que cero.");
+
+                var reserva = await _repository.GetByIdAsync(idReserva);
+                if (!reserva.Success || reserva.Data is null)
+                    return Failure<bool>(reserva.Message ?? "La reserva no existe.");
+
+                if (!esAdministrador && reserva.Data.IdCliente != idCliente)
+                    return Failure<bool>("No puedes cancelar una reserva que no es tuya.");
+
+                if (reserva.Data.Estado == "Cancelada")
+                    return Failure<bool>("La reserva ya está cancelada.");
+
+                var actualizar = new ReservaUpdate
+                {
+                    Id = reserva.Data.Id,
+                    IdCliente = reserva.Data.IdCliente,
+                    IdHabitacion = reserva.Data.IdHabitacion,
+                    CantidadPersonas = reserva.Data.CantidadPersonas,
+                    Estado = "Cancelada",
+                    TotalReserva = reserva.Data.TotalReserva,
+                    FechaEntrada = reserva.Data.FechaEntrada,
+                    FechaSalida = reserva.Data.FechaSalida
+                };
+
+                var resultado = await _repository.UpdateAsync(actualizar);
+                return resultado.Success && resultado.Data
+                    ? new OperationResult<bool> { Data = true, Message = "Reserva cancelada correctamente." }
+                    : Failure<bool>(resultado.Message ?? "No se pudo cancelar la reserva.");
+            });
+        }
 
         public Task<OperationResult<bool>> AddAsync(ReservaAdd? reserva)
         {

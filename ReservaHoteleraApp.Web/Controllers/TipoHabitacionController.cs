@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion;
@@ -7,6 +8,7 @@ namespace ReservaHoteleraApp.Web.Controllers
     // Controlador del módulo "Tipos de Habitación".
     // Es un catálogo simple: no depende de otros módulos,
     // por eso solo necesita un servicio.
+    [Authorize(Roles ="Administrador")]
     public class TipoHabitacionController : Controller
     {
         private readonly ITipoHabitacionServices _tipoHabitacionServices;

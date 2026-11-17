@@ -28,7 +28,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             {
                 // Traemos también el Piso y el TipoHabitacion relacionados
                 // para poder mostrar el número de piso y el nombre del tipo en la tabla.
-                var habitaciones = await context.Habitaciones.AsNoTracking().Include(h => h.Piso).Include(h => h.TipoHabitacion).ToListAsync();
+                var habitaciones = await context.Habitaciones.AsNoTracking().Include(h => h.Piso!.Bloque!.Hotel).Include(h => h.TipoHabitacion).ToListAsync();
                 var models = habitaciones.Select(MapToModel).ToList();
 
                 return new OperationResult<List<HabitacionModel>>
@@ -48,7 +48,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
         {
             try
             {
-                var habitacion = await context.Habitaciones.AsNoTracking().Include(h => h.Piso).Include(h => h.TipoHabitacion).FirstOrDefaultAsync(h => h.Id == id);
+                var habitacion = await context.Habitaciones.AsNoTracking().Include(h => h.Piso!.Bloque!.Hotel).Include(h => h.TipoHabitacion).FirstOrDefaultAsync(h => h.Id == id);
                 if (habitacion is null)
                     return Failure<HabitacionModel>("La habitación no existe.");
 
@@ -62,6 +62,36 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             {
                 logger.LogError(ex, "Error al consultar la habitación con id {Id}.", id);
                 return Failure<HabitacionModel>("No se pudo consultar la habitación.");
+            }
+        }
+
+        // Habitaciones libres para un rango de fechas:
+        // se excluyen las de mantenimiento y las que tienen una reserva no cancelada que se cruza.
+        public async Task<OperationResult<List<HabitacionModel>>> GetDisponiblesAsync(DateTime fechaEntrada, DateTime fechaSalida)
+        {
+            try
+            {
+                var habitaciones = await context.Habitaciones.AsNoTracking()
+                    .Include(h => h.Piso!.Bloque!.Hotel)
+                    .Include(h => h.TipoHabitacion)
+                    .Where(h => h.Estado != "Mantenimiento")
+                    .Where(h => !context.Reservas.Any(r =>
+                        r.IdHabitacion == h.Id &&
+                        r.Estado != "Cancelada" &&
+                        r.FechaEntrada < fechaSalida &&
+                        (r.FechaSalida == null || r.FechaSalida > fechaEntrada)))
+                    .ToListAsync();
+
+                return new OperationResult<List<HabitacionModel>>
+                {
+                    Data = habitaciones.Select(MapToModel).ToList(),
+                    Message = "Habitaciones disponibles consultadas correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar las habitaciones disponibles.");
+                return Failure<List<HabitacionModel>>("No se pudieron consultar las habitaciones disponibles.");
             }
         }
 
@@ -214,8 +244,12 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 IdTipoHabitacion = habitacion.IdTipoHabitacion,
                 PrecioNoche = habitacion.PrecioNoche,
                 Estado = habitacion.Estado,
+                IdHotel = habitacion.Piso?.Bloque?.IdHotel,
                 PisoNumero = habitacion.Piso?.Numero,
-                TipoHabitacionNombre = habitacion.TipoHabitacion?.Nombre
+                TipoHabitacionNombre = habitacion.TipoHabitacion?.Nombre,
+                BloqueNombre = habitacion.Piso?.Bloque?.Nombre,
+                HotelNombre = habitacion.Piso?.Bloque?.Hotel?.Nombre,
+                Ciudad = habitacion.Piso?.Bloque?.Hotel?.Ciudad
             };
         }
     }

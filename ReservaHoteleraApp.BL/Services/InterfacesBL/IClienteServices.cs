@@ -7,6 +7,7 @@ namespace ReservaHoteleraApp.BL.Services.Interfaces
     {
         Task<OperationResult<List<ClienteModel>>> GetAllAsync();
         Task<OperationResult<ClienteModel>> GetByIdAsync(int id);
+        Task<OperationResult<ClienteModel>> GetByUsuarioIdAsync(int idUsuario);
         Task<OperationResult<bool>> AddAsync(ClienteAdd? cliente);
         Task<OperationResult<bool>> UpdateAsync(ClienteUpdate? cliente);
         Task<OperationResult<bool>> DeleteAsync(ClienteRemove? cliente);

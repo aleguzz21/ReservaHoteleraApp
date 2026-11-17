@@ -39,6 +39,19 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
             });
         }
 
+        public Task<OperationResult<List<HabitacionModel>>> GetDisponiblesAsync(DateTime fechaEntrada, DateTime fechaSalida)
+        {
+            return ExecuteAsync<List<HabitacionModel>>("Consultar habitaciones disponibles", null, async () =>
+            {
+                if (fechaEntrada < DateTime.Today)
+                    return Failure<List<HabitacionModel>>("La fecha de entrada no puede ser anterior a hoy.");
+                if (fechaSalida <= fechaEntrada)
+                    return Failure<List<HabitacionModel>>("La fecha de salida debe ser posterior a la fecha de entrada.");
+
+                return await _repository.GetDisponiblesAsync(fechaEntrada, fechaSalida);
+            });
+        }
+
         public Task<OperationResult<bool>> AddAsync(HabitacionAdd? habitacion)
         {
             return ExecuteAsync<bool>("Registrar habitación", habitacion?.CreatedUser, async () =>

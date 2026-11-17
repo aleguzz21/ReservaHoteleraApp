@@ -1,10 +1,15 @@
 ﻿@model IEnumerable<ReservaHoteleraApp.DAL.Models.Objects.Hotel.HotelModel>
+@using ReservaHoteleraApp.DAL.Models.Objects.Habitacion
 @using ReservaHoteleraApp.DAL.Models.Objects.Hotel
 
 @{
     ViewData["Title"] = "Inicio";
     var entrada = ViewData["FechaEntrada"] as DateTime?;
     var salida = ViewData["FechaSalida"] as DateTime?;
+    var hotelSeleccionado = ViewData["HotelId"] as int?;
+    var buscando = ViewData["Buscando"] is bool valor && valor;
+    var habitaciones = ViewData["Habitaciones"] as List<HabitacionModel> ?? new List<HabitacionModel>();
+    var haySesion = User.Identity?.IsAuthenticated == true;
 
     // Fecha de hoy en formato yyyy-MM-dd (el que entiende <input type="date">).
     var hoy = DateTime.Today.ToString("yyyy-MM-dd");
@@ -30,7 +35,7 @@
                     <input id="destino" name="destino" type="text" placeholder="¿Adónde vas?" autocomplete="off" />
                 </div>
             </div>
-
+            @*
             <div class="booking-search-field booking-search-dates">
                 <span class="booking-search-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -38,6 +43,7 @@
                         <path d="M3 9h18M8 2v4M16 2v4" />
                     </svg>
                 </span>
+                
                 <div class="booking-search-body">
                     <label>Seleccionar fechas</label>
                     <div class="booking-dates-row">
@@ -80,7 +86,7 @@
                         </select>
                     </div>
                 </div>
-            </div>
+            </div>*@
 
             <button type="submit" class="booking-search-btn">Buscar</button>
         </form>
@@ -89,6 +95,106 @@
             <input type="checkbox" /> Viajo por trabajo
         </label>*@
     </div>
+</section>
+
+<section class="booking-availability" id="disponibles">
+    <h2 class="booking-section-title">Reserva tu habitación</h2>
+    <p class="booking-availability-subtitle">Elige el hotel y las fechas para ver las habitaciones disponibles.</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form class="booking-availability-form" method="get" asp-controller="Home" asp-action="Index">
+        <div class="booking-availability-field">
+            <label for="homeHotelId">Hotel</label>
+            <select id="homeHotelId" name="hotelId">
+                <option value="">Todos los hoteles</option>
+                @foreach (var hotel in Model)
+                {
+                    if (hotelSeleccionado == hotel.Id)
+                    {
+                        <option value="@hotel.Id" selected>@hotel.Nombre</option>
+                    }
+                    else
+                    {
+                        <option value="@hotel.Id">@hotel.Nombre</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="booking-availability-field">
+            <label for="homeFechaEntrada">Entrada</label>
+            <input id="homeFechaEntrada" name="fechaEntrada" type="date" min="@hoy"
+                   value="@(entrada?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="booking-availability-field">
+            <label for="homeFechaSalida">Salida</label>
+            <input id="homeFechaSalida" name="fechaSalida" type="date" min="@hoy"
+                   value="@(salida?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <button type="submit" class="booking-search-btn">Ver habitaciones</button>
+    </form>
+
+    @if (buscando)
+    {
+        <h3 class="booking-availability-results-title">
+            Habitaciones libres del @(entrada?.ToString("dd/MM/yyyy")) al @(salida?.ToString("dd/MM/yyyy"))
+        </h3>
+
+        if (!habitaciones.Any())
+        {
+            <p class="booking-empty">
+                No hay habitaciones disponibles con esos criterios.
+                <a class="booking-link-all" asp-action="Index">Quitar filtros</a>
+            </p>
+        }
+        else
+        {
+            <div class="booking-availability-grid">
+                @foreach (var habitacion in habitaciones)
+                {
+                    <article class="booking-room-card">
+                        <div class="booking-room-head">
+                            <h4>@habitacion.HotelNombre</h4>
+                            <span class="booking-room-price">@habitacion.PrecioNoche.ToString("C") / noche</span>
+                        </div>
+                        <p class="booking-room-meta">
+                            Habitación @habitacion.Numero
+                            @if (habitacion.PisoNumero.HasValue)
+                            {
+                                <text> · Piso @habitacion.PisoNumero</text>
+                            }
+                            <br />
+                            @habitacion.TipoHabitacionNombre
+                        </p>
+                        <div class="booking-room-actions">
+                            @if (haySesion)
+                            {
+                                <a class="booking-room-cta"
+                                   asp-controller="Reserva" asp-action="Create"
+                                   asp-route-habitacionId="@habitacion.Id"
+                                   asp-route-fechaEntrada="@(entrada?.ToString("yyyy-MM-dd"))"
+                                   asp-route-fechaSalida="@(salida?.ToString("yyyy-MM-dd"))">Reservar</a>
+                            }
+                            else
+                            {
+                                <a class="booking-room-login" asp-controller="Account" asp-action="Login">
+                                    Inicia sesión para reservar
+                                </a>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+            <p class="booking-availability-more">
+                <a class="booking-link-all" asp-controller="Habitacion" asp-action="Index"
+                   asp-route-fechaEntrada="@(entrada?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaSalida="@(salida?.ToString("yyyy-MM-dd"))">Ver el listado completo</a>
+            </p>
+        }
+    }
 </section>
 
 <section class="booking-why">
@@ -171,7 +277,10 @@
                         {
                             <p class="booking-hotel-phone">Tel. @hotel.Telefono</p>
                         }
-                        <a class="booking-hotel-cta" asp-controller="Hotel" asp-action="Details" asp-route-id="@hotel.Id">Ver detalles</a>
+                        <div class="booking-hotel-actions">
+                            <a class="booking-hotel-cta" asp-action="Index" asp-route-hotelId="@hotel.Id">Ver habitaciones</a>
+                            <a class="booking-link-all" asp-controller="Hotel" asp-action="Details" asp-route-id="@hotel.Id">Ver detalles</a>
+                        </div>
                     </div>
                 </article>
             }

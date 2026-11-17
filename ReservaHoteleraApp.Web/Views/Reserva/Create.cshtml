@@ -1,0 +1,65 @@
+@* Vista: formulario para reservar una habitación.
+   Las fechas se limitan con min (comodidad); la regla real está en BL. *@
+@model ReservaViewModel
+
+@{
+    ViewData["Title"] = "Reservar habitación";
+    var hoy = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<h1>Reservar habitación @Model.NumeroHabitacion</h1>
+<p>
+    @if (!string.IsNullOrWhiteSpace(Model.HotelNombre))
+    {
+        <text>@Model.HotelNombre · </text>
+    }
+    @if (Model.PisoNumero.HasValue)
+    {
+        <text>Piso @Model.PisoNumero · </text>
+    }
+    @Model.TipoHabitacionNombre
+    <br />
+    Precio por noche: @Model.PrecioNoche.ToString("C")
+</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create" method="post">
+            <input type="hidden" asp-for="IdHabitacion" />
+            <input type="hidden" asp-for="NumeroHabitacion" />
+            <input type="hidden" asp-for="HotelNombre" />
+            <input type="hidden" asp-for="PisoNumero" />
+            <input type="hidden" asp-for="TipoHabitacionNombre" />
+            <input type="hidden" asp-for="PrecioNoche" />
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FechaEntrada" class="control-label"></label>
+                <input asp-for="FechaEntrada" asp-format="{0:yyyy-MM-dd}" class="form-control" type="date" min="@hoy" />
+                <span asp-validation-for="FechaEntrada" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FechaSalida" class="control-label"></label>
+                <input asp-for="FechaSalida" asp-format="{0:yyyy-MM-dd}" class="form-control" type="date" min="@hoy" />
+                <span asp-validation-for="FechaSalida" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CantidadPersonas" class="control-label"></label>
+                <input asp-for="CantidadPersonas" class="form-control" type="number" min="1" max="20" />
+                <span asp-validation-for="CantidadPersonas" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Confirmar reserva</button>
+            <a asp-controller="Habitacion" asp-action="Details" asp-route-id="@Model.IdHabitacion"
+               class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

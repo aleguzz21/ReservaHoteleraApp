@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ReservaHoteleraApp.BL.Services.Interfaces;
@@ -8,6 +9,7 @@ namespace ReservaHoteleraApp.Web.Controllers
     // Controlador del módulo "Bloques".
     // Un bloque pertenece a un hotel, por eso también necesitamos IHotelServices
     // para llenar el desplegable (dropdown) de hoteles en los formularios.
+    [Authorize(Roles ="Administrador")]
     public class BloqueController : Controller
     {
         private readonly IBloqueServices _bloqueServices;

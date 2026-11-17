@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ReservaHoteleraApp.BL.Services.Interfaces;
@@ -37,14 +38,38 @@ namespace ReservaHoteleraApp.Web.Controllers
             ViewBag.Tipos = new SelectList(tipos.Data ?? new(), "Id", "Nombre", idTipo);
         }
 
-        // GET /Habitacion -> lista de habitaciones.
-        public async Task<IActionResult> Index()
+        // GET /Habitacion -> habitaciones disponibles para las fechas indicadas.
+        // Con verTodas=true (administrador) se muestra el inventario completo.
+        public async Task<IActionResult> Index(string? fechaEntrada, string? fechaSalida, bool verTodas = false)
         {
-            var result = await _habitacionServices.GetAllAsync();
-            if (!result.Success)
-                TempData["Error"] = result.Message;
+            DateTime entrada;
+            if (!DateTime.TryParse(fechaEntrada, out entrada) || entrada < DateTime.Today)
+                entrada = DateTime.Today;
 
-            return View(result.Data ?? new List<HabitacionModel>());
+            DateTime salida;
+            if (!DateTime.TryParse(fechaSalida, out salida) || salida <= entrada)
+                salida = entrada.AddDays(1);
+
+            ViewBag.FechaEntrada = entrada.ToString("yyyy-MM-dd");
+            ViewBag.FechaSalida = salida.ToString("yyyy-MM-dd");
+            ViewBag.EntradaFecha = entrada;
+            ViewBag.SalidaFecha = salida;
+            ViewBag.VerTodas = verTodas;
+
+            if (verTodas)
+            {
+                var todas = await _habitacionServices.GetAllAsync();
+                if (!todas.Success)
+                    TempData["Error"] = todas.Message;
+
+                return View(todas.Data ?? new List<HabitacionModel>());
+            }
+
+            var disponibles = await _habitacionServices.GetDisponiblesAsync(entrada, salida);
+            if (!disponibles.Success)
+                TempData["Error"] = disponibles.Message;
+
+            return View(disponibles.Data ?? new List<HabitacionModel>());
         }
 
         // GET /Habitacion/Details/5 -> detalles de una habitación.
@@ -60,6 +85,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // GET /Habitacion/Create -> formulario vacío.
+        [Authorize(Roles ="Administrador")]
         public async Task<IActionResult> Create()
         {
             await CargarCombosAsync();
@@ -67,6 +93,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // POST /Habitacion/Create -> guarda la nueva habitación.
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HabitacionAdd habitacion)
@@ -90,6 +117,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // GET /Habitacion/Edit/5 -> carga la habitación en el formulario.
+        [Authorize(Roles ="Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var result = await _habitacionServices.GetByIdAsync(id);
@@ -114,6 +142,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // POST /Habitacion/Edit -> guarda los cambios.
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(HabitacionUpdate habitacion)
@@ -137,6 +166,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // GET /Habitacion/Delete/5 -> confirmación para eliminar.
+        [Authorize(Roles ="Administrador")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _habitacionServices.GetByIdAsync(id);
@@ -149,6 +179,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // POST /Habitacion/Delete -> elimina la habitación confirmada.
+        [Authorize(Roles ="Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -493,6 +493,155 @@ body {
   padding: 16px 0;
 }
 
+/* ---------- Disponibilidad en la página de inicio ---------- */
+.booking-availability {
+  padding: 36px 0 8px;
+}
+
+.booking-availability-subtitle {
+  color: #595959;
+  margin: -8px 0 18px;
+}
+
+.booking-availability-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  background: #f5f7f6;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.booking-availability-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.booking-availability-field label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #6b6b6b;
+  margin: 0;
+}
+
+.booking-availability-field select,
+.booking-availability-field input {
+  width: 100%;
+  border: 1px solid #cfd6d2;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: .95rem;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.booking-availability-form .booking-search-btn {
+  min-height: 42px;
+  font-size: 1rem;
+  padding: 0 22px;
+}
+
+.booking-availability-results-title {
+  margin: 26px 0 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.booking-availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+
+.booking-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+}
+
+.booking-room-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.booking-room-head h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.booking-room-price {
+  color: #057ac9;
+  font-weight: 700;
+  font-size: .95rem;
+  white-space: nowrap;
+}
+
+.booking-room-meta {
+  margin: 0;
+  color: #595959;
+  font-size: .9rem;
+}
+
+.booking-room-actions {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.booking-room-cta {
+  display: inline-block;
+  background: #279b2c;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+.booking-room-cta:hover {
+  background: #1f7f24;
+  color: #fff;
+}
+
+.booking-room-login {
+  font-size: .9rem;
+  color: #057ac9;
+  font-weight: 600;
+}
+
+.booking-room-login:hover {
+  text-decoration: underline;
+}
+
+.booking-availability-more {
+  margin: 16px 0 0;
+}
+
+.booking-hotel-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.booking-hotel-actions .booking-hotel-cta {
+  margin-top: 0;
+}
+
 /* ---------- Pie ---------- */
 .booking-footer {
   margin-top: 32px;

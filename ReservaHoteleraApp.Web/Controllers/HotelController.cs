@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models.Objects.Hotel;
@@ -80,7 +81,8 @@ namespace ReservaHoteleraApp.Web.Controllers
         // ---------------------------------------------------------
         // CREAR HOTEL (mostrar formulario)
         // GET: /Hotel/Create
-        // ---------------------------------------------------------
+       // ---------------------------------------------------------
+       [Authorize(Roles ="Administrador")]
         public IActionResult Create()
         {
             return View();
@@ -88,8 +90,9 @@ namespace ReservaHoteleraApp.Web.Controllers
 
         // ---------------------------------------------------------
         // CREAR HOTEL (guardar formulario)
-        // POST: /Hotel/Create
+        // POST: /Hotel/Create        
         // ---------------------------------------------------------
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken] // Protege contra ataques CSRF.
         public async Task<IActionResult> Create(HotelAdd hotel)
@@ -124,8 +127,9 @@ namespace ReservaHoteleraApp.Web.Controllers
 
         // ---------------------------------------------------------
         // EDITAR HOTEL (mostrar formulario)
-        // GET: /Hotel/Edit/5
+        // GET: /Hotel/Edit/5        
         // ---------------------------------------------------------
+        [Authorize(Roles ="Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var respuesta = await _hotelServices.GetByIdAsync(id);
@@ -151,6 +155,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         // EDITAR HOTEL (guardar cambios)
         // POST: /Hotel/Edit
         // ---------------------------------------------------------
+        [Authorize(Roles ="Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(HotelUpdate hotel)
@@ -184,6 +189,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         // ELIMINAR HOTEL (mostrar confirmación)
         // GET: /Hotel/Delete/5
         // ---------------------------------------------------------
+        [Authorize(Roles ="Administrador")]
         public async Task<IActionResult> Delete(int id)
         {
             var respuesta = await _hotelServices.GetByIdAsync(id);
@@ -202,6 +208,7 @@ namespace ReservaHoteleraApp.Web.Controllers
         // POST: /Hotel/Delete
         // Se llama "DeleteConfirmed" porque el GET ya se llama "Delete".
         // ---------------------------------------------------------
+        [Authorize(Roles ="Administrador")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

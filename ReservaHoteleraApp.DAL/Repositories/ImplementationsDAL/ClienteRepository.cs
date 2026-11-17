@@ -40,6 +40,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             }
         }
 
+
         public async Task<OperationResult<ClienteModel>> GetByIdAsync(int id)
         {
             try
@@ -61,6 +62,28 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             }
         }
 
+
+        public async Task<OperationResult<ClienteModel>> GetByUsuarioIdAsync(int idUsuario) {
+
+            try { 
+            
+            var cliente = await context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
+                if (cliente is null)
+                    return Failure<ClienteModel>("El cliente no existe.");
+                return new OperationResult<ClienteModel>
+                {
+                    Data = MapToModel(cliente),
+                    Message = "Cliente consultado correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al consultar el cliente con idUsuario {IdUsuario}.", idUsuario);
+                return Failure<ClienteModel>("No se pudo consultar el cliente.");
+            }
+        }
+
+      
         public async Task<OperationResult<bool>> AddAsync(ClienteAdd cliente)
         {
             if (cliente is null)

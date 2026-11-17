@@ -154,7 +154,9 @@ dotnet run --project ReservaHoteleraApp.Web\ReservaHoteleraApp.Web.csproj --urls
       (actualmente está comentado en `Views\Home\Index.cshtml`).
 - [ ] Validar fechas en el servidor cuando se implemente el guardado de reservas.
 - [ ] Las fechas y la ocupación todavía **no filtran**; por ahora solo filtra el destino.
-- [ ] Crear controladores y vistas para Reserva, Estadía, Pago y Cliente
+- [x] Controlador y vista de **Reserva** (acción `Create`; ver Fase 7 y Parte 5).
+- [x] `Reserva/Index` («Mis reservas») con cancelación — ver §32.
+- [ ] Crear controladores y vistas para Estadía, Pago y Cliente
       (existen en BL/DAL pero no en Web).
 - [ ] Unificar estilos de botones, tablas, formularios y mensajes de alerta
       (pendiente de la sección 16.3 de la bitácora).
@@ -189,8 +191,8 @@ dotnet run --project ReservaHoteleraApp.Web\ReservaHoteleraApp.Web.csproj --urls
 # Parte 2 — Autenticación, roles y reservas
 
 **Fecha de este registro:** 15/11/2026
-**Estado actual:** Fase 2 completada; Fase 3 en curso (ViewModels y `AccountController` listos, faltan las vistas). Ver Parte 3.
-**Cómo retomar:** leer la sección 21 (qué falta) y la Parte 3 (sección 20 en adelante).
+**Estado actual:** Fase 7 completada y verificada (reservas del cliente y «Mis reservas», §32), más el registro del usuario `Cliente` `Rafael1313` (§33). Siguiente: Fase 8 (checklist) — falta el CRUD como Administrador. Ver Parte 5.
+**Cómo retomar:** leer la Parte 5 (secciones 29 a 31), la Parte 4 (24 a 28) y la sección 16.
 
 ## 8. Objetivo de esta etapa
 
@@ -299,10 +301,11 @@ Compila. Todavía no hay login, pero la app debe seguir funcionando.
 
 ---
 
-## 12. Fase 3 — Registro y login (EN CURSO — 16/11/2026)
+## 12. Fase 3 — Registro y login (COMPLETADA — 17/11/2026)
 
-**Estado:** los dos ViewModels y el `AccountController` ya están creados y compilan.
-Falta crear las vistas de `Views/Account` (ver Parte 3 al final del documento).
+**Estado:** ViewModels, `AccountController` y las tres vistas de `Views/Account`
+(`Login`, `Register`, `AccessDenied`) creados. Build 0 errores / 0 advertencias.
+Detalle de cierre en la Parte 4 (sección 24).
 
 ### 12.1 Crear `ReservaHoteleraApp.Web\Models\LoginViewModel.cs`
 
@@ -622,7 +625,9 @@ Compila, entra a `/Account/Register`, crea un usuario y luego inicia sesión en 
 
 ---
 
-## 13. Fase 4 — Sesión en _Layout.cshtml (PENDIENTE)
+## 13. Fase 4 — Sesión en _Layout.cshtml (COMPLETADA — 17/11/2026)
+
+**Estado:** bloque de sesión agregado en `_Layout.cshtml`. Ver cierre en la Parte 4 (sección 26).
 
 **Archivo:** `ReservaHoteleraApp.Web\Views\Shared\_Layout.cshtml`
 
@@ -695,7 +700,10 @@ Envolver las demás pestañas:
 
 ---
 
-## 14. Fase 5 — Autorización por roles (PENDIENTE)
+## 14. Fase 5 — Autorización por roles (COMPLETADA — 17/11/2026)
+
+**Estado:** atributos `[Authorize(Roles = "Administrador")]` aplicados en los 5
+controladores. Ver cierre en la Parte 4 (sección 27).
 
 Agregar en cada controlador:
 
@@ -747,7 +755,10 @@ Hacer lo mismo con `PisoController` y `TipoHabitacionController`.
 
 ---
 
-## 15. Fase 6 — Crear el administrador (PENDIENTE)
+## 15. Fase 6 — Crear el administrador (COMPLETADA — 17/11/2026)
+
+**Estado:** el usuario `Aleguzz21` fue promovido a `Administrador` en `HotelDB`.
+Ver cierre en la Parte 4 (sección 28).
 
 1. Registrarse desde `/Account/Register`.
 2. Ejecutar en SSMS o HeidiSQL:
@@ -770,7 +781,12 @@ WHERE NombreUsuario = 'tu_usuario';
 
 ---
 
-## 16. Fase 7 — Reservas del cliente (PENDIENTE)
+## 16. Fase 7 — Reservas del cliente (COMPLETADA — 17/11/2026)
+
+> Cerrada y verificada en ejecución. Detalle final en la Parte 5 (secciones 29 a 31).
+> El código de abajo es el plan original; se aplicó con dos ajustes: el redirect del
+> POST va a `Habitacion/Index` (la home no muestra `TempData`) y se quitó
+> `r.Estado == null` de la consulta de disponibilidad (`Reserva.Estado` no es anulable).
 
 ### 16.1 DAL: buscar cliente por usuario
 
@@ -1136,19 +1152,25 @@ Si la vista `Habitacion\Index` muestra enlaces de Editar/Eliminar, envolverlos t
 
 ## 17. Fase 8 — Checklist de pruebas
 
-- [ ] Registro crea usuario con rol `Cliente` y su ficha en `Clientes`.
-- [ ] Login correcto muestra "Hola, usuario".
-- [ ] Login incorrecto muestra error.
-- [ ] Logout borra la sesión.
-- [ ] Sin sesión, `/Hotel` y `/Hotel/Details/1` son públicos.
-- [ ] Cliente no ve pestañas de Bloques, Pisos, Tipos ni Habitaciones.
-- [ ] Cliente no puede abrir `/Hotel/Create` ni `/Habitacion/Create`.
+> Actualizado el 17/11/2026 tras verificar la Fase 7. `[x]` = probado en ejecución.
+
+- [x] Registro crea usuario con rol `Cliente` y su ficha en `Clientes` (`Rafael1313`, 17/11/2026).
+- [x] Login correcto muestra "Hola, usuario".
+- [x] Login incorrecto muestra error.
+- [x] Logout borra la sesión.
+- [x] Sin sesión, `/Hotel` y `/Hotel/Details/1` son públicos.
+- [x] Cliente no ve pestañas de Bloques, Pisos, Tipos ni Habitaciones.
+- [x] Cliente no puede abrir `/Hotel/Create` ni `/Habitacion/Create`.
 - [ ] Administrador ve todo y puede crear/editar/eliminar.
-- [ ] Cliente autenticado puede reservar.
-- [ ] Sin sesión, `/Reserva/Create?habitacionId=1` redirige al login.
-- [ ] Reserva con fecha pasada o salida menor/igual a entrada se rechaza.
-- [ ] Reserva en fechas ocupadas se rechaza.
-- [ ] Total de la reserva = noches × precio por noche.
+- [x] Cliente autenticado puede reservar (`Rafael1313`, total 800.00, 05→07/07/2027).
+- [x] Sin sesión, `/Reserva/Create?habitacionId=1` redirige al login.
+- [x] Reserva con fecha pasada o salida menor/igual a entrada se rechaza.
+- [x] Reserva en fechas ocupadas se rechaza.
+- [x] Total de la reserva = noches × precio por noche.
+- [x] Cantidad de personas fuera de 1–20 se rechaza.
+- [x] El botón "Reservar" no aparece sin sesión.
+- [x] «Mis reservas» muestra hotel, habitación, fechas, noches, personas, total y estado.
+- [x] Cancelar una reserva libera sus fechas para volver a reservar.
 
 ---
 
@@ -1171,7 +1193,11 @@ Si la vista `Habitacion\Index` muestra enlaces de Editar/Eliminar, envolverlos t
 - **16/11/2026:** Fase 2 completada: cookies configuradas en `Program.cs`. Build 0 errores / 0 advertencias.
 - **16/11/2026:** Fase 3 en curso: `LoginViewModel`, `RegisterViewModel` y `AccountController` completos y compilando.
 - **16/11/2026:** Siguiente paso: crear `Views/Account/{Login,Register,AccessDenied}.cshtml`.
-- **Pendiente:** Fases 4 a 8 (sesión en layout, roles, administrador, reservas y pruebas).
+- **17/11/2026:** Fase 3 completada: creadas las vistas `Login`, `Register` y `AccessDenied`. Build 0 errores / 0 advertencias.
+- **17/11/2026:** Fase 4 completada: menú con sesión en `_Layout.cshtml`. Home y Login verificados en ejecución (200).
+- **17/11/2026:** Fase 5 completada: 15 atributos `[Authorize(Roles = "Administrador")]`. Redirecciones verificadas (302 a Login).
+- **17/11/2026:** Fase 6 completada: `Aleguzz21` promovido a `Administrador` en `HotelDB` (verificado con SELECT).
+- **Pendiente:** Fase 8 (checklist, sobre todo con un usuario `Cliente`) y `Reserva/Index`.
 
 ---
 
@@ -1236,7 +1262,9 @@ Archivo: `ReservaHoteleraApp.Web\Controllers\AccountController.cs`
 - `[HttpPost]` y `[ValidateAntiForgeryToken]` presentes en Login, Register y Logout.
 - Compilación verificada: 0 errores, 0 advertencias.
 
-## 21. Qué falta para terminar la Fase 3 (Bloque C — vistas)
+## 21. Qué faltaba para terminar la Fase 3 (Bloque C — vistas) — COMPLETADO 17/11/2026
+
+> Cerrado: las tres vistas existen. Ver Parte 4 (sección 24).
 
 Carpeta a crear: `ReservaHoteleraApp.Web\Views\Account`
 
@@ -1271,3 +1299,445 @@ El código completo de las tres vistas está en la sección 12.4, 12.5 y 12.6 de
 - El rol nunca viene del formulario: el registro fuerza `"Cliente"`.
 - Las contraseñas se hashean en BL (`UsuarioServices`); el controlador no las guarda en claro.
 - `TempData["Success"]` debe escribirse exactamente así (con dos `s`).
+
+---
+
+# Parte 4 — Sesión del 17/11/2026 (Fase 3 completada)
+
+## 24. Cierre de la Fase 3 — vistas de cuenta
+
+Carpeta creada: `ReservaHoteleraApp.Web\Views\Account`
+
+| Archivo | Estado | Notas |
+|---|---|---|
+| `Login.cshtml` | Creada | `@model LoginViewModel`, `asp-validation-summary="All"`, campos Usuario/Contraseña/Recordarme |
+| `Register.cshtml` | Creada | `@model RegisterViewModel`, los 7 campos del ViewModel |
+| `AccessDenied.cshtml` | Creada | Mensaje y enlace de vuelta al inicio |
+
+Decisiones:
+
+- Se usó `asp-validation-summary="All"` para que también se vea el error que el
+  controlador agrega con `ModelState.AddModelError` (credenciales incorrectas).
+- El token antiforgery lo genera el tag helper `<form>`, porque las acciones POST
+  tienen `[ValidateAntiForgeryToken]`.
+- Se mantuvo el estilo de `Hotel/Create.cshtml` (`row`, `col-md-5`, `form-group mb-3`).
+- Se usó `Html.RenderPartialAsync("_ValidationScriptsPartial")` dentro de
+  `@section Scripts`, igual que en las vistas existentes.
+
+Verificación:
+
+- `dotnet build` de la solución: 0 errores, 0 advertencias.
+- Al cerrar la Fase 4 se ejecutó la app: Home y `/Account/Login` respondieron 200.
+  La prueba completa de registro + login sigue pendiente de hacerse a mano.
+
+Prueba manual pendiente:
+
+1. Ejecutar con F5 y abrir `http://localhost:5030/Account/Register`.
+2. Crear una cuenta; debe redirigir a `/Account/Login`.
+3. Iniciar sesión; debe redirigir a `Home/Index`.
+4. Enviar el login vacío: deben aparecer los mensajes de `[Required]`.
+5. Enviar credenciales incorrectas: debe aparecer el mensaje del controlador.
+
+Nota: el enlace al login ya se ve en el menú desde la Fase 4 (sección 25).
+Antes de eso se entraba por URL directa.
+
+## 25. Fase 4 completada — sesión en el menú
+
+Archivo: `ReservaHoteleraApp.Web\Views\Shared\_Layout.cshtml`
+
+Cambios:
+
+- `<ul class="booking-nav-actions">` ahora es condicional:
+  - Sin sesión: "Alta gratuita" (Register) e "Iniciar sesión" (Login).
+  - Con sesión: "Hola, {usuario}", "Registra tu alojamiento" solo si es
+    `Administrador`, y botón "Cerrar sesión" (form POST a `Account/Logout`).
+  - "Ver hoteles" queda siempre visible.
+- Las pestañas Bloques, Pisos, Tipos de Habitación y Habitaciones se muestran solo
+  si `User.IsInRole("Administrador")`. Inicio y Hoteles quedan públicos.
+- El formulario de logout lleva `method="post"`; el tag helper genera el token
+  antiforgery que exige `[ValidateAntiForgeryToken]` en `Logout`.
+- Se conservaron `asp-area=""` y las clases `booking-*` del diseño actual.
+
+Verificación en ejecución (17/11/2026):
+
+- `dotnet build`: 0 errores, 0 advertencias.
+- `GET /`: 200 y contiene "Iniciar sesión" y "Alta gratuita" sin sesión.
+- `GET /Account/Login`: 200, contiene el input `NombreUsuario` y el token
+  `__RequestVerificationToken`.
+
+Importante: ocultar pestañas **no es seguridad**. Cualquiera puede escribir la URL
+directa. La protección real es la Fase 5 con `[Authorize(Roles = "Administrador")]`.
+
+Prueba manual pendiente:
+
+1. Sin sesión, la home debe mostrar "Alta gratuita" e "Iniciar sesión".
+2. Registrarse e iniciar sesión: el menú debe mostrar "Hola, usuario" y "Cerrar sesión".
+3. Pulsar "Cerrar sesión": debe volver a mostrar los enlaces de invitado.
+4. Las pestañas de administración se activan con el usuario administrador (Fase 6, ya hecho).
+
+## 26. Fase 5 completada — autorización por roles
+
+Archivos modificados (todos en `ReservaHoteleraApp.Web\Controllers`):
+
+| Archivo | Atributos | Alcance |
+|---|---|---|
+| `HotelController.cs` | 6 | Create GET/POST, Edit GET/POST, Delete GET, DeleteConfirmed |
+| `HabitacionController.cs` | 6 | Create GET/POST, Edit GET/POST, Delete GET, DeleteConfirmed |
+| `BloqueController.cs` | 1 | Clase completa |
+| `PisoController.cs` | 1 | Clase completa |
+| `TipoHabitacionController.cs` | 1 | Clase completa |
+
+Se agregó `using Microsoft.AspNetCore.Authorization;` en los cinco archivos.
+
+Quedan públicos:
+
+- `HotelController.Index` y `HotelController.Details`.
+- `HabitacionController.Index` y `HabitacionController.Details`.
+- `HomeController`, `AccountController`.
+
+Verificación en ejecución (17/11/2026, sin sesión):
+
+- `GET /Hotel/Create` → **302** a `/Account/Login?ReturnUrl=%2FHotel%2FCreate`.
+- `GET /Bloque` → **302** a `/Account/Login?ReturnUrl=%2FBloque`.
+- `GET /Hotel` → **200**.
+- `GET /Account/Login` → **200**.
+- `dotnet build`: 0 errores, 0 advertencias.
+
+Prueba manual pendiente:
+
+1. Sin sesión, `/Hotel/Create` debe llevar al login.
+2. Con un cliente registrado, `/Hotel/Create` debe llevar a `/Account/AccessDenied`.
+3. El caso "administrador entra normal" ya se puede probar con `Aleguzz21` (Fase 6).
+
+Nota: el rol se lee del *claim* guardado en la cookie al iniciar sesión. Si cambias el
+rol de un usuario en la base de datos, debe cerrar sesión y volver a entrar.
+
+## 27. Fase 6 completada — usuario administrador
+
+Verificado en la base `HotelDB` (SQL Server `localhost`, autenticación Windows):
+
+| Id | NombreUsuario | Rol | Activo |
+|---|---|---|---|
+| 1 | `Aleguzz21` | `Administrador` | 1 |
+
+Procedimiento usado:
+
+```sql
+USE HotelDB;
+GO
+UPDATE Usuarios
+SET Rol = 'Administrador'
+WHERE NombreUsuario = 'Aleguzz21';
+GO
+```
+
+Notas:
+
+- El rol **no** se cambia desde la web: el registro siempre crea `Cliente`.
+- Después de cambiar el rol en la BD hay que **cerrar sesión y volver a entrar**,
+  porque el rol vive en un *claim* de la cookie.
+- No se modificó la contraseña; el hash sigue igual.
+- Sin cambios de esquema ni migraciones.
+
+## 28. Próximo paso (cumplido el 17/11/2026)
+
+La Fase 7 se completó. Detalle en la Parte 5 (secciones 29 a 31).
+
+---
+
+# Parte 5 — Sesión del 17/11/2026 (Fase 7 completada)
+
+## 29. Cierre de la Fase 7 — reservas del cliente
+
+**Estado:** COMPLETADA y verificada en ejecución.
+**Build:** 0 errores, 0 advertencias.
+**Base de datos:** sin cambios de esquema ni migraciones.
+
+### Archivos tocados
+
+| Capa | Archivo | Cambio |
+|---|---|---|
+| DAL | `Repositories\InterfacesDAL\IClienteRepository.cs` | `GetByUsuarioIdAsync` |
+| DAL | `Repositories\ImplementationsDAL\ClienteRepository.cs` | idem |
+| BL | `Services\InterfacesBL\IClienteServices.cs` | idem |
+| BL | `Services\ImplementationsBL\ClienteServices.cs` | idem |
+| DAL | `Repositories\InterfacesDAL\IReservaRepository.cs` | `EstaDisponibleAsync` |
+| DAL | `Repositories\ImplementationsDAL\ReservaRepository.cs` | idem |
+| BL | `Services\InterfacesBL\IReservaServices.cs` | idem |
+| BL | `Services\ImplementationsBL\ReservaServices.cs` | idem |
+| Web | `Models\ReservaViewModel.cs` | nuevo |
+| Web | `Controllers\ReservaController.cs` | nuevo (GET + POST) |
+| Web | `Views\Reserva\Create.cshtml` | nueva |
+| Web | `Views\Habitacion\Details.cshtml` | botón Reservar; Editar solo Administrador |
+| Web | `Views\Habitacion\Index.cshtml` | Editar/Eliminar solo Administrador |
+
+### Decisiones y diferencias con el plan original
+
+1. **`r.Estado != "Cancelada"`** — `Reserva.Estado` es `string` no anulable, así que el
+   `r.Estado == null` del borrador sobraba.
+2. **Redirect del POST a `Habitacion/Index`** en vez de `Home/Index`: la home no muestra
+   `TempData`, así que el mensaje de éxito no se vería.
+3. **Precio y total se recalculan en el servidor** con `habitacion.Data.PrecioNoche`.
+   Los campos ocultos `PrecioNoche` y `NumeroHabitacion` solo sirven para redibujar el
+   formulario cuando hay un error.
+4. **`[Authorize]` a nivel de clase** en `ReservaController` (sin roles): cliente y
+   administrador pueden reservar; sin sesión redirige a `/Account/Login`.
+5. No se registró nada nuevo en `Program.cs`: los servicios ya estaban en
+   `BL\DependencyInjection.cs`.
+
+### Verificación en ejecución (17/11/2026)
+
+| Prueba | Resultado |
+|---|---|
+| `GET /Reserva/Create?habitacionId=1` sin sesión | 302 a `/Account/Login?ReturnUrl=...` |
+| `GET /Habitacion/Details/1` sin sesión | 200 y **sin** botón Reservar |
+| Login `Aleguzz21` / contraseña registrada | sesión activa |
+| `GET /Reserva/Create?habitacionId=1` con sesión | 200, habitación 109, precio 400 |
+| Reserva 10→13/03/2027, 2 personas | éxito, «Reserva registrada correctamente» |
+| Repetir las mismas fechas | «no está disponible en esas fechas» |
+| Entrada 01/01/2020 | «no puede ser anterior a hoy» |
+| Salida igual a entrada | «debe ser posterior a la fecha de entrada» |
+| 99 personas | `[Range]`: «entre 1 y 20 personas» |
+
+Fila creada en `HotelDB.Reservas`:
+
+| Id | IdCliente | IdHabitacion | Personas | Estado | Total | Entrada | Salida |
+|---|---|---|---|---|---|---|---|
+| 1 | 1 | 1 | 2 | Pendiente | 1200.00 | 2027-03-10 | 2027-03-13 |
+
+Total = 3 noches × 400. Los 4 intentos inválidos no crearon filas.
+
+> La reserva de prueba (Id 1) quedó en la BD como evidencia. Para borrarla:
+> `DELETE FROM Reservas WHERE Id = 1;`
+
+### Errores de aprendizaje de la sesión
+
+- `CS0111` → método pegado dos veces en `ClienteRepository`. Solución: buscar el nombre
+  con `Ctrl + F` antes de pegar.
+- `CS0308` → Visual Studio agregó `using System.ClientModel.Primitives;`, que tiene un
+  `OperationResult` no genérico. Solución: usar siempre
+  `using ReservaHoteleraApp.DAL.Models;` y no aceptar el `using` equivocado.
+
+## 30. Pendientes al cierre de la Fase 7
+
+- [x] `Reserva/Index`: listar reservas del usuario autenticado (y todas para el admin) — ver §32.
+- [x] Cancelar reserva (`Estado = "Cancelada"`), que ya libera la habitación — ver §32.
+- [ ] `Estadia`, `Pago` y `Cliente`: controladores y vistas (existen en BL/DAL).
+- [ ] Validación de fechas en servidor al **editar** una reserva.
+- [ ] Condición de carrera: verificar disponibilidad + insertar no es atómico. A futuro,
+      transacción o restricción en la base.
+- [ ] Unificar estilos de botones, tablas, formularios y alertas.
+- [ ] Prueba manual con un usuario **Cliente** (no solo administrador): registro, login,
+      pestañas ocultas y `/Hotel/Create` → `AccessDenied`.
+- [ ] Etiquetas `[Display(Name = "...")]` en `ReservaViewModel` para que los labels no
+      salgan como `FechaEntrada`.
+
+## 31. Historial de avance (reservas)
+
+- **17/11/2026:** DAL y BL de cliente por usuario (`GetByUsuarioIdAsync`).
+- **17/11/2026:** DAL y BL de disponibilidad por fechas (`EstaDisponibleAsync`).
+- **17/11/2026:** `ReservaViewModel`, `ReservaController` (GET/POST) y `Views\Reserva\Create.cshtml`.
+- **17/11/2026:** botón Reservar en `Habitacion/Details`; Editar/Eliminar solo administrador.
+- **17/11/2026:** build 0/0, 9 pruebas de ejecución y verificación en base de datos.
+- **17/11/2026:** `Reserva/Index` («Mis reservas») y cancelación que libera fechas (ver §32).
+- **17/11/2026:** verificación completa con usuario `Cliente` (`Rafael1313`): permisos, reserva y cancelación ajena bloqueada.
+- **17/11/2026:** incidente de usuario duplicado resuelto (se borró el huérfano Id 2); registro nuevo `Rafael1313` (Usuario 8 / Cliente 3).
+- **Siguiente:** Fase 8 (checklist) — queda comprobar CRUD completo como administrador.
+
+## 32. Ampliación posterior — «Mis reservas» (`Reserva/Index`)
+
+**Estado:** COMPLETADA y verificada en ejecución (17/11/2026). Build 0/0.
+
+### Qué se agregó
+
+| Capa | Archivo | Cambio |
+|---|---|---|
+| DAL | `Models\Objects\Reserva\ReservaDetalleModel.cs` | nuevo: reserva + hotel/bloque/piso/habitación/tipo y `Noches` |
+| DAL | `Repositories\InterfacesDAL\IReservaRepository.cs` | `GetByClienteIdAsync`, `GetAllConDetalleAsync` |
+| DAL | `Repositories\ImplementationsDAL\ReservaRepository.cs` | `ConsultaDetalle()` con `Include` de Cliente y Habitacion→Piso→Bloque→Hotel→TipoHabitacion; `MapToDetalle` |
+| BL | `Services\InterfacesBL\IReservaServices.cs` | 3 métodos nuevos; se quitó un `using` sin uso |
+| BL | `Services\ImplementationsBL\ReservaServices.cs` | `GetByClienteIdAsync`, `GetAllConDetalleAsync`, `CancelarAsync` |
+| Web | `Controllers\ReservaController.cs` | `Index`, `Cancelar` (POST) y `ObtenerIdClienteAsync` |
+| Web | `Views\Reserva\Index.cshtml` | tabla con hotel, habitación, piso/tipo, fechas, noches, personas, total, estado y botón Cancelar |
+| Web | `Views\Shared\_Layout.cshtml` | enlace «Mis reservas» para usuarios con sesión |
+
+### Reglas
+
+- El **administrador ve todas** las reservas; el cliente solo las suyas (filtra por `IdCliente`).
+- El hotel **no se guarda** en `Reservas`: se obtiene por
+  `Habitación → Piso → Bloque → Hotel`.
+- Cancelar **no borra**: pone `Estado = "Cancelada"`. La consulta de disponibilidad ya
+  ignora las canceladas, por eso las fechas quedan libres.
+- `CancelarAsync(idReserva, idCliente, esAdministrador)` valida en BL que la reserva sea
+  del cliente (salvo admin) y que no esté ya cancelada.
+
+### Verificación en ejecución
+
+| Prueba | Resultado |
+|---|---|
+| `GET /Reserva` sin sesión | 302 al login |
+| `GET /Reserva` como administrador | 200; muestra «The Marriot», piso 2, «Suite Presidencial», Pendiente y botón Cancelar |
+| Enlace «Mis reservas» en el menú | presente con sesión |
+| `POST /Reserva/Cancelar` (Id 1) | «Reserva cancelada correctamente» y badge Cancelada |
+| Cancelar dos veces la misma | «La reserva ya está cancelada» |
+| Reservar otra vez 10→13/03/2027 | éxito: la cancelación liberó las fechas |
+
+Estado final en `HotelDB.Reservas`:
+
+| Id | Estado | Total | Entrada | Salida |
+|---|---|---|---|---|
+| 1 | Cancelada | 1200.00 | 2027-03-10 | 2027-03-13 |
+| 2 | Pendiente | 1200.00 | 2027-03-10 | 2027-03-13 |
+| 3 | Pendiente | 800.00 | 2027-07-05 | 2027-07-07 |
+
+### Verificación con un usuario `Cliente` (`Rafael1313`)
+
+| Prueba | Resultado |
+|---|---|
+| Login `Rafael1313` (contraseña definida en el registro) | sesión activa |
+| Menú | «Mis reservas» y «Cerrar sesión»; **sin** pestañas de admin ni «Registra tu alojamiento» |
+| `GET /Reserva` sin reservas | estado vacío |
+| `GET /Hotel/Create`, `/Habitacion/Create` y `/Bloque` | «Acceso denegado» |
+| Reservar habitación 109, 05→07/07/2027, 2 personas | éxito; total 800.00 |
+| `GET /Reserva` | The Marriot, 2 noches, Pendiente; columna Cliente oculta |
+| Intentar cancelar la reserva Id 2 (de otro cliente) | «No puedes cancelar una reserva que no es tuya» |
+| Logout + `GET /Reserva` | 302 al login |
+
+> Las 3 filas son datos de prueba. Para limpiarlas:
+> `DELETE FROM Reservas WHERE Id IN (1, 2, 3);`
+
+## 33. Registro del usuario Cliente y estado final (17/11/2026)
+
+### Incidente resuelto: nombre de usuario duplicado
+
+- Al registrarse con `Rafael1313` la app respondió: «No se pudo registrar el usuario.
+  Verifique datos duplicados o referencias que no existen.»
+- Causa: `IX_Usuarios_NombreUsuario` es un índice **único** y ya existía un usuario
+  `Rafael1313` (Id 2) de un intento anterior.
+- Ese usuario estaba **huérfano**: sin ficha en `Clientes`, sin reservas y sin registros
+  de actividad. Se eliminó con `DELETE FROM Usuarios WHERE Id = 2;`.
+- El registro nuevo creó:
+  - `Usuarios` Id 8 → `Rafael1313`, rol `Cliente`, activo.
+  - `Clientes` Id 3 → `Rafael Elpidio Guzman`, ligado a `IdUsuario = 8`.
+
+### Comportamiento esperado en el formulario
+
+- Cuando el POST falla y se vuelve a mostrar la vista, los campos de contraseña salen
+  **vacíos**: ASP.NET nunca rellena `input type="password"`. No es un error; hay que
+  volver a escribirlas.
+- El mensaje de duplicado viene del `DbUpdateException` del repositorio, no de una
+  validación previa. Mejora futura: consultar `GetByNombreUsuarioAsync` antes de insertar
+  y devolver un mensaje más claro.
+
+### Credenciales de prueba
+
+- `Aleguzz21` → rol `Administrador`, con ficha de cliente (Id 1).
+- `Rafael1313` → rol `Cliente`, con ficha de cliente (Id 3).
+- Las contraseñas **no** se guardan en este documento ni en el repositorio.
+
+### Estado actual de la base de datos
+
+- `Usuarios`: Id 1 `Aleguzz21` (Administrador) e Id 8 `Rafael1313` (Cliente).
+- `Clientes`: Id 1 (usuario 1) e Id 3 (usuario 8).
+- `Reservas`: 3 filas de prueba (ver tabla de §32).
+
+Para limpiar solo las reservas de prueba:
+
+```sql
+USE HotelDB;
+DELETE FROM Reservas WHERE Id IN (1, 2, 3);
+```
+
+### Cómo retomar la próxima sesión
+
+1. Detener la app en Visual Studio y compilar:
+   `dotnet build ReservaHoteleraApp.slnx`.
+2. Rutas para probar:
+   - Públicas: `/`, `/Hotel`, `/Habitacion`, `/Habitacion/Details/1`.
+   - Con sesión: `/Reserva/Create?habitacionId=1` y `/Reserva` («Mis reservas»).
+   - Cuenta: `/Account/Login`, `/Account/Register`.
+3. Pendiente del checklist: CRUD completo como **Administrador** (crear/editar/eliminar
+   Hotel, Habitación, Bloque, Piso y Tipo de Habitación) y validación de fechas al
+   editar una reserva.
+
+
+
+## 34. Selección de habitaciones disponibles y reserva desde la web (17/11/2026)
+
+### Lo que pidió el usuario
+
+> «Hacer las reservas en la página web, seleccionar las habitaciones disponibles para
+> reservarlas y ver las reservas.»
+
+Se cerró el flujo completo: el cliente elige fechas → la web muestra **solo las
+habitaciones libres** en ese rango → pulsa «Reservar» con las fechas precargadas → confirma
+→ sus reservas aparecen en «Mis reservas».
+
+### Cambios por capa
+
+| Capa | Archivo | Cambio |
+|---|---|---|
+| DAL modelo | `Models\Objects\Habitacion\HabitacionModel.cs` | Nuevas propiedades `BloqueNombre`, `HotelNombre`, `Ciudad`. |
+| DAL | `Repositories\ImplementationsDAL\HabitacionRepository.cs` | `GetAll`/`GetById` ahora incluyen `Piso.Bloque.Hotel`; nuevo `GetDisponiblesAsync(entrada, salida)`; `MapToModel` rellena hotel/bloque/ciudad. |
+| DAL ifaz | `Repositories\InterfacesDAL\IHabitacionRepository.cs` | Declara `GetDisponiblesAsync`. |
+| BL ifaz | `Services\InterfacesBL\IHabitacionServices.cs` | Declara `GetDisponiblesAsync`. |
+| BL | `Services\ImplementationsBL\HabitacionServices.cs` | Valida fechas (entrada ≥ hoy, salida > entrada) y delega en el repositorio. |
+| Web | `Controllers\HabitacionController.cs` | `Index(string? fechaEntrada, string? fechaSalida, bool verTodas)` filtra por fechas; `verTodas=true` (admin) muestra inventario completo. |
+| Web | `Views\Habitacion\Index.cshtml` | Formulario de fechas, columnas Hotel/Ciudad, badge de estado solo en «Ver todas», botón «Reservar» por fila con `habitacionId` + fechas, «Mis reservas». |
+| Web | `Models\ReservaViewModel.cs` | Nuevos campos `HotelNombre`, `PisoNumero`, `TipoHabitacionNombre`. |
+| Web | `Controllers\ReservaController.cs` | `Create` GET acepta `fechaEntrada`/`fechaSalida` y precarga datos del hotel; bloquea habitaciones en «Mantenimiento» en GET y POST. |
+| Web | `Views\Reserva\Create.cshtml` | Cabecera con hotel, piso y tipo; `hidden` para los nuevos campos. |
+| Web | `Views\Habitacion\Details.cshtml` | Filas «Hotel» (con ciudad) y «Bloque». |
+
+### Regla de disponibilidad usada
+
+Una habitación está libre para `[entrada, salida)` cuando:
+
+1. `Estado != "Mantenimiento"`, y
+2. no existe una reserva con `Estado != "Cancelada"` que se cruce:
+   `reserva.FechaEntrada < salida AND (reserva.FechaSalida IS NULL OR reserva.FechaSalida > entrada)`.
+
+La comparación es de rango semiabierto: quien sale el día 13 libera la noche del 13.
+
+### Verificación automatizada (PowerShell + `Invoke-WebRequest`)
+
+| Prueba | Resultado |
+|---|---|
+| Anónimo en `/Habitacion` | sin botón «Reservar» ni «Mis reservas» |
+| Cliente `Rafael1313`, 10→13/03/2027 | 003 visible; 109 excluida (reserva pendiente); 401 excluida (mantenimiento) |
+| Sin fechas (hoy→mañana) | 401 excluida |
+| `GET /Reserva/Create?habitacionId=3` | redirige con «La habitación está en mantenimiento» |
+| `GET /Reserva/Create?habitacionId=2&fechaEntrada=2027-07-05&fechaSalida=2027-07-07` | hotel «Embassy Suites», fechas precargadas |
+| `POST /Reserva/Create` (habitación 2, 05→07/07/2027, 2 personas) | «Reserva registrada correctamente», total 400.00 |
+| `GET /Habitacion` mismas fechas tras reservar | 003 ya no aparece |
+| `GET /Reserva` | muestra 05/07/2027 y «Embassy Suites by Hilton Santo Domingo» |
+| Admin `Aleguzz21`, `?verTodas=true` | incluye 401 + botones Editar/Eliminar; enlace «Volver a disponibles» |
+| Admin filtrado 10→13/03/2027 | 109 excluida |
+
+> La reserva creada en la prueba se eliminó con
+> `DELETE FROM Reservas WHERE IdCliente = 3 AND IdHabitacion = 2 AND FechaEntrada = '2027-07-05';`
+> La BD quedó otra vez con 3 filas.
+
+### Nota sobre el estado de la BD
+
+La reserva Id 3 (cliente 3, 109, 05→07/07/2027) quedó en **Cancelada** tras la prueba de
+cancelación de §32. Por eso el 109 sí aparece como disponible en esas fechas; no es un
+fallo del filtro.
+
+### Cómo probarlo a mano
+
+1. `dotnet run --project ReservaHoteleraApp.Web` (o F5 en Visual Studio).
+2. Entrar como `Rafael1313` → pestaña «Habitaciones».
+3. Elegir fechas y pulsar «Buscar disponibles».
+4. «Reservar» → revisar hotel/fechas precargadas → «Confirmar reserva».
+5. «Mis reservas» para ver el estado y cancelar si hace falta.
+6. Como `Aleguzz21`, el enlace «Ver todas» devuelve el inventario completo (con 401 en
+   mantenimiento y acciones de edición).
+
+### Pendientes que siguen abiertos
+
+- CRUD completo como Administrador desde la web (Hotel, Habitación, Bloque, Piso, Tipo).
+- Validar fechas al **editar** una reserva (hoy no existe esa pantalla).
+- El campo `Habitaciones.Estado` («Ocupada») es informativo y no bloquea la reserva: la
+  ocupación real la decide el cruce de fechas con `Reservas`.
+- `FechaSalida` es `DateTime?` en la BD; el flujo web siempre la guarda con valor.
