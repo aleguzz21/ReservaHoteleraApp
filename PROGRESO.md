@@ -1741,3 +1741,104 @@ fallo del filtro.
 - El campo `Habitaciones.Estado` («Ocupada») es informativo y no bloquea la reserva: la
   ocupación real la decide el cruce de fechas con `Reservas`.
 - `FechaSalida` es `DateTime?` en la BD; el flujo web siempre la guarda con valor.
+
+---
+
+# Parte 6 — Capa API (22/11/2026)
+
+**Rama:** `api/AlexGuzman`
+**Estado:** COMPLETADA y verificada. Build 0 errores / 0 advertencias, pruebas 6/6.
+**Siguiente paso:** commit + push de la rama y PDF con capturas de Swagger/endpoints.
+
+## 35. Objetivo
+
+Crear la capa `ReservaHoteleraApp.Api` con un controlador por cada entidad del
+proyecto, usando el mismo patrón del profe (`SGM.Api`) y el mismo estilo de los
+controladores Web (comentarios en español, `var respuesta`,
+`if (respuesta.Success == false)` primero), sin tocar la Web.
+
+## 36. Controladores creados (11)
+
+Carpeta: `ReservaHoteleraApp.Api\Controllers`
+
+| Controlador | Endpoints |
+|---|---|
+| `HotelController` | `GET /api/Hotel`, `GET /api/Hotel/Buscar?destino=`, `GET /api/Hotel/{id}`, `POST CreateHotel`, `POST ModifyHotel`, `POST DisableHotel` |
+| `BloqueController` | `GET /api/Bloque`, `GET /api/Bloque/{id}`, `POST CreateBloque`, `POST ModifyBloque`, `POST DisableBloque` |
+| `PisoController` | `GET /api/Piso`, `GET /api/Piso/{id}`, `POST CreatePiso`, `POST ModifyPiso`, `POST DisablePiso` |
+| `TipoHabitacionController` | `GET /api/TipoHabitacion`, `GET /api/TipoHabitacion/{id}`, `POST Create/Modify/DisableTipoHabitacion` |
+| `HabitacionController` | `GET /api/Habitacion`, `GET /api/Habitacion/Disponibles?fechaEntrada=&fechaSalida=`, `GET /api/Habitacion/{id}`, `POST Create/Modify/DisableHabitacion` |
+| `ClienteController` | `GET /api/Cliente`, `GET /api/Cliente/{id}`, `GET /api/Cliente/PorUsuario/{idUsuario}`, `POST Create/Modify/DisableCliente` |
+| `UsuarioController` | `GET /api/Usuario`, `GET /api/Usuario/{id}`, `GET /api/Usuario/PorNombre/{nombreUsuario}`, `POST ValidarCredenciales`, `POST Create/Modify/DisableUsuario` |
+| `ReservaController` | `GET /api/Reserva`, `GET /api/Reserva/ConDetalle`, `GET /api/Reserva/Cliente/{idCliente}`, `GET /api/Reserva/Disponible?idHabitacion=&fechaEntrada=&fechaSalida=`, `GET /api/Reserva/{id}`, `POST Cancelar`, `POST Create/Modify/DisableReserva` |
+| `EstadiaController` | `GET /api/Estadia`, `GET /api/Estadia/{id}`, `POST Create/Modify/DisableEstadia` |
+| `PagoController` | `GET /api/Pago`, `GET /api/Pago/{id}`, `POST Create/Modify/DisablePago` |
+| `RegistroActividadController` | `GET /api/RegistroActividad`, `GET /api/RegistroActividad/{id}`, `POST Create/Modify/DisableRegistroActividad` |
+
+## 37. Cambios de infraestructura
+
+| Archivo | Cambio |
+|---|---|
+| `ReservaHoteleraApp.Api\Program.cs` | `AddEndpointsApiExplorer()` + `AddSwaggerGen()`; `UseSwagger()` + `UseSwaggerUI()` dentro del bloque `IsDevelopment()`. |
+| `ReservaHoteleraApp.Api\ReservaHoteleraApp.Api.csproj` | Se quitó `Microsoft.AspNetCore.OpenApi 10.0.13` (conflicto `NU1107` de `Microsoft.OpenApi`) y se agregó `Swashbuckle.AspNetCore 11.0.1`. |
+| `ReservaHoteleraApp.Api\Properties\launchSettings.json` | `launchBrowser: true` y `launchUrl: "swagger"`. |
+| `ReservaHoteleraApp.Api\WeatherForecast.cs` y `Controllers\WeatherForecastController.cs` | Eliminados (eran de la plantilla). |
+| `ReservaHoteleraApp.DAL\Repositories\ImplementationsDAL\HotelRepository.cs` | `AddAsync` ahora valida `null` y llama a `ValidateHotel` antes de insertar (igual que los otros 10 repositorios). |
+
+Clases simples dentro de los controladores (sin `record`):
+`UsuarioRespuesta`, `ValidarCredencialesRequest` (en `UsuarioController`) y
+`CancelarReservaRequest` (en `ReservaController`).
+
+## 38. Seguridad
+
+- `UsuarioController` nunca devuelve `Contrasena`: `GetAll`, `GetById`,
+  `PorNombre` y `ValidarCredenciales` usan `UsuarioRespuesta`
+  (`Id`, `NombreUsuario`, `Rol`, `Activo`).
+- La API no tiene autenticación ni autorización (igual que el ejemplo del profe);
+  el login se valida con `POST /api/Usuario/ValidarCredenciales`.
+
+## 39. Verificación (22/11/2026)
+
+| Prueba | Resultado |
+|---|---|
+| `dotnet build ReservaHoteleraApp.slnx` | 0 errores, 0 advertencias |
+| `dotnet test ReservaHoteleraApp.slnx` | 6/6 correctas |
+| `GET /swagger/index.html` (Development) | 200 |
+| Rutas en `swagger/v1/swagger.json` | 64 (11 controladores) |
+| GET de las 11 entidades y rutas extra | 200 |
+| `GET /api/Usuario` | 200, campos `id, nombreUsuario, rol, activo` (sin contraseña) |
+| `GET /api/Hotel/999999` | 400 «El hotel no existe.» |
+| POST con cuerpo vacío (`CreateHotel`, `ModifyHotel`, `DisableHotel`, `CreateHabitacion`, `CreatePago`) | 400 |
+| `POST /api/Usuario/ValidarCredenciales` con usuario inexistente | 400 |
+| `POST /api/Reserva/Cancelar` con reserva inexistente | 400 |
+| Web (`/` y `/Hotel`) tras los cambios | 200 (la Web no se modificó) |
+
+## 40. Cómo ejecutar la API
+
+Desde `C:\Users\DELL\source\repos\ReservaHoteleraApp`:
+
+```powershell
+dotnet run --project ReservaHoteleraApp.Api
+```
+
+Se abre `http://localhost:5161/swagger` (puerto y apertura configurados en
+`launchSettings.json`).
+
+Notas:
+- Swagger solo se activa con `ASPNETCORE_ENVIRONMENT=Development`.
+- Si se ejecuta el `.dll` directo, hay que hacerlo desde la carpeta
+  `ReservaHoteleraApp.Api` para que encuentre `appsettings.json` (cadena `HotelDb`).
+- Detener la depuración en Visual Studio antes de compilar (bloqueo de `bin`).
+
+## 41. Pendientes
+
+- [ ] `git add` + `git commit` + `git push` de la rama `api/AlexGuzman`.
+- [ ] PDF con capturas de Swagger y de los endpoints (el video no se hará).
+- [ ] (Opcional) `[ProducesResponseType]` para documentar códigos en Swagger.
+
+## 42. Historial de avance (API)
+
+- **22/11/2026:** 11 controladores de la API creados y ajustados al estilo de la Web.
+- **22/11/2026:** Swagger configurado con Swashbuckle 11.0.1; plantilla `WeatherForecast` eliminada.
+- **22/11/2026:** `HotelRepository.AddAsync` blindado (null + `ValidateHotel`).
+- **22/11/2026:** Verificado build (0/0), pruebas (6/6), Swagger (200, 64 rutas), GET/POST y Web (200).

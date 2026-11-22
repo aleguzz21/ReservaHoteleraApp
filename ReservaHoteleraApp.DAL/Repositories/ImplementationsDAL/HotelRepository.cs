@@ -68,6 +68,13 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
 
         public async Task<OperationResult<bool>> AddAsync(HotelAdd hotelAdd)
         {
+            if (hotelAdd is null)
+                return Failure<bool>("El objeto HotelAdd es requerido.");
+
+            var validation = ValidateHotel(hotelAdd);
+            if (validation is not null)
+                return Failure<bool>(validation);
+
             try
             {
                 var entity = new Hotel
