@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR ESTADÍAS
         // GET: api/Estadia
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UNA ESTADÍA
         // GET: api/Estadia/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR ESTADÍA
         // POST: api/Estadia/CreateEstadia
-        // ---------------------------------------------------------
         [HttpPost("CreateEstadia")]
         public async Task<IActionResult> Post([FromBody] EstadiaAdd estadia)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR ESTADÍA
         // POST: api/Estadia/ModifyEstadia
-        // ---------------------------------------------------------
         [HttpPost("ModifyEstadia")]
         public async Task<IActionResult> Put([FromBody] EstadiaUpdate estadia)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR ESTADÍA
         // POST: api/Estadia/DisableEstadia
-        // ---------------------------------------------------------
         [HttpPost("DisableEstadia")]
         public async Task<IActionResult> DisableEstadia([FromBody] EstadiaRemove estadia)
         {

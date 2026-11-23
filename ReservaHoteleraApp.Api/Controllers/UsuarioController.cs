@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR USUARIOS (sin mostrar la contraseña)
         // GET: api/Usuario
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -56,10 +54,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(new { respuesta.Success, respuesta.Message, Data = listaUsuarios });
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN USUARIO (sin mostrar la contraseña)
         // GET: api/Usuario/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -83,10 +79,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(new { respuesta.Success, respuesta.Message, Data = usuarioRespuesta });
         }
 
-        // ---------------------------------------------------------
         // USUARIO POR NOMBRE DE USUARIO (sin mostrar la contraseña)
         // GET: api/Usuario/PorNombre/AlexGuzman
-        // ---------------------------------------------------------
         [HttpGet("PorNombre/{nombreUsuario}")]
         public async Task<IActionResult> PorNombre(string nombreUsuario)
         {
@@ -110,10 +104,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(new { respuesta.Success, respuesta.Message, Data = usuarioRespuesta });
         }
 
-        // ---------------------------------------------------------
         // VALIDAR CREDENCIALES
         // POST: api/Usuario/ValidarCredenciales
-        // ---------------------------------------------------------
         [HttpPost("ValidarCredenciales")]
         public async Task<IActionResult> ValidarCredenciales([FromBody] ValidarCredencialesRequest request)
         {
@@ -137,10 +129,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(new { respuesta.Success, respuesta.Message, Data = usuarioRespuesta });
         }
 
-        // ---------------------------------------------------------
         // CREAR USUARIO
         // POST: api/Usuario/CreateUsuario
-        // ---------------------------------------------------------
         [HttpPost("CreateUsuario")]
         public async Task<IActionResult> Post([FromBody] UsuarioAdd usuario)
         {
@@ -154,10 +144,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR USUARIO
         // POST: api/Usuario/ModifyUsuario
-        // ---------------------------------------------------------
         [HttpPost("ModifyUsuario")]
         public async Task<IActionResult> Put([FromBody] UsuarioUpdate usuario)
         {
@@ -171,10 +159,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR USUARIO
         // POST: api/Usuario/DisableUsuario
-        // ---------------------------------------------------------
         [HttpPost("DisableUsuario")]
         public async Task<IActionResult> DisableUsuario([FromBody] UsuarioRemove usuario)
         {

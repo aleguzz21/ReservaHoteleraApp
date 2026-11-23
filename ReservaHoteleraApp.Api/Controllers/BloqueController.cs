@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR BLOQUES
         // GET: api/Bloque
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN BLOQUE
         // GET: api/Bloque/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR BLOQUE
         // POST: api/Bloque/CreateBloque
-        // ---------------------------------------------------------
         [HttpPost("CreateBloque")]
         public async Task<IActionResult> Post([FromBody] BloqueAdd bloque)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR BLOQUE
         // POST: api/Bloque/ModifyBloque
-        // ---------------------------------------------------------
         [HttpPost("ModifyBloque")]
         public async Task<IActionResult> Put([FromBody] BloqueUpdate bloque)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR BLOQUE
         // POST: api/Bloque/DisableBloque
-        // ---------------------------------------------------------
         [HttpPost("DisableBloque")]
         public async Task<IActionResult> DisableBloque([FromBody] BloqueRemove bloque)
         {

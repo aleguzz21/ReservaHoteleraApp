@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR HABITACIONES
         // GET: api/Habitacion
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // HABITACIONES DISPONIBLES ENTRE DOS FECHAS
         // GET: api/Habitacion/Disponibles?fechaEntrada=2026-01-01&fechaSalida=2026-01-05
-        // ---------------------------------------------------------
         [HttpGet("Disponibles")]
         public async Task<IActionResult> Disponibles([FromQuery] DateTime fechaEntrada, [FromQuery] DateTime fechaSalida)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UNA HABITACIÓN
         // GET: api/Habitacion/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -79,10 +73,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR HABITACIÓN
         // POST: api/Habitacion/CreateHabitacion
-        // ---------------------------------------------------------
         [HttpPost("CreateHabitacion")]
         public async Task<IActionResult> Post([FromBody] HabitacionAdd habitacion)
         {
@@ -96,10 +88,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR HABITACIÓN
         // POST: api/Habitacion/ModifyHabitacion
-        // ---------------------------------------------------------
         [HttpPost("ModifyHabitacion")]
         public async Task<IActionResult> Put([FromBody] HabitacionUpdate habitacion)
         {
@@ -113,10 +103,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR HABITACIÓN
         // POST: api/Habitacion/DisableHabitacion
-        // ---------------------------------------------------------
         [HttpPost("DisableHabitacion")]
         public async Task<IActionResult> DisableHabitacion([FromBody] HabitacionRemove habitacion)
         {

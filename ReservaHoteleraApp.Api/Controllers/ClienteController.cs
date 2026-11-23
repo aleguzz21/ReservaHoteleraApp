@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR CLIENTES
         // GET: api/Cliente
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN CLIENTE
         // GET: api/Cliente/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CLIENTE ASOCIADO A UN USUARIO
         // GET: api/Cliente/PorUsuario/5
-        // ---------------------------------------------------------
         [HttpGet("PorUsuario/{idUsuario}")]
         public async Task<IActionResult> PorUsuario(int idUsuario)
         {
@@ -79,10 +73,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR CLIENTE
         // POST: api/Cliente/CreateCliente
-        // ---------------------------------------------------------
         [HttpPost("CreateCliente")]
         public async Task<IActionResult> Post([FromBody] ClienteAdd cliente)
         {
@@ -96,10 +88,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR CLIENTE
         // POST: api/Cliente/ModifyCliente
-        // ---------------------------------------------------------
         [HttpPost("ModifyCliente")]
         public async Task<IActionResult> Put([FromBody] ClienteUpdate cliente)
         {
@@ -113,10 +103,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR CLIENTE
         // POST: api/Cliente/DisableCliente
-        // ---------------------------------------------------------
         [HttpPost("DisableCliente")]
         public async Task<IActionResult> DisableCliente([FromBody] ClienteRemove cliente)
         {

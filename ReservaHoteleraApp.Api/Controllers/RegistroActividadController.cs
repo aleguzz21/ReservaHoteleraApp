@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR REGISTROS DE ACTIVIDAD
         // GET: api/RegistroActividad
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN REGISTRO DE ACTIVIDAD
         // GET: api/RegistroActividad/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR REGISTRO DE ACTIVIDAD
         // POST: api/RegistroActividad/CreateRegistroActividad
-        // ---------------------------------------------------------
         [HttpPost("CreateRegistroActividad")]
         public async Task<IActionResult> Post([FromBody] RegistroActividadAdd registroActividad)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR REGISTRO DE ACTIVIDAD
         // POST: api/RegistroActividad/ModifyRegistroActividad
-        // ---------------------------------------------------------
         [HttpPost("ModifyRegistroActividad")]
         public async Task<IActionResult> Put([FromBody] RegistroActividadUpdate registroActividad)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR REGISTRO DE ACTIVIDAD
         // POST: api/RegistroActividad/DisableRegistroActividad
-        // ---------------------------------------------------------
         [HttpPost("DisableRegistroActividad")]
         public async Task<IActionResult> DisableRegistroActividad([FromBody] RegistroActividadRemove registroActividad)
         {

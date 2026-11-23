@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR PISOS
         // GET: api/Piso
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN PISO
         // GET: api/Piso/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR PISO
         // POST: api/Piso/CreatePiso
-        // ---------------------------------------------------------
         [HttpPost("CreatePiso")]
         public async Task<IActionResult> Post([FromBody] PisoAdd piso)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR PISO
         // POST: api/Piso/ModifyPiso
-        // ---------------------------------------------------------
         [HttpPost("ModifyPiso")]
         public async Task<IActionResult> Put([FromBody] PisoUpdate piso)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR PISO
         // POST: api/Piso/DisablePiso
-        // ---------------------------------------------------------
         [HttpPost("DisablePiso")]
         public async Task<IActionResult> DisablePiso([FromBody] PisoRemove piso)
         {

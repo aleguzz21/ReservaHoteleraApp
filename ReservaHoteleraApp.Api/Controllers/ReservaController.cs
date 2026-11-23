@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR RESERVAS
         // GET: api/Reserva
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // LISTAR RESERVAS CON DETALLE
         // GET: api/Reserva/ConDetalle
-        // ---------------------------------------------------------
         [HttpGet("ConDetalle")]
         public async Task<IActionResult> ConDetalle()
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // RESERVAS DE UN CLIENTE
         // GET: api/Reserva/Cliente/5
-        // ---------------------------------------------------------
         [HttpGet("Cliente/{idCliente}")]
         public async Task<IActionResult> Cliente(int idCliente)
         {
@@ -79,10 +73,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // VERIFICAR DISPONIBILIDAD DE UNA HABITACIÓN
         // GET: api/Reserva/Disponible?idHabitacion=1&fechaEntrada=2026-01-01&fechaSalida=2026-01-05
-        // ---------------------------------------------------------
         [HttpGet("Disponible")]
         public async Task<IActionResult> Disponible([FromQuery] int idHabitacion, [FromQuery] DateTime fechaEntrada, [FromQuery] DateTime fechaSalida)
         {
@@ -97,10 +89,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UNA RESERVA
         // GET: api/Reserva/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -115,10 +105,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CANCELAR RESERVA
         // POST: api/Reserva/Cancelar
-        // ---------------------------------------------------------
         [HttpPost("Cancelar")]
         public async Task<IActionResult> Cancelar([FromBody] CancelarReservaRequest request)
         {
@@ -132,10 +120,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR RESERVA
         // POST: api/Reserva/CreateReserva
-        // ---------------------------------------------------------
         [HttpPost("CreateReserva")]
         public async Task<IActionResult> Post([FromBody] ReservaAdd reserva)
         {
@@ -149,10 +135,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR RESERVA
         // POST: api/Reserva/ModifyReserva
-        // ---------------------------------------------------------
         [HttpPost("ModifyReserva")]
         public async Task<IActionResult> Put([FromBody] ReservaUpdate reserva)
         {
@@ -166,10 +150,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR RESERVA
         // POST: api/Reserva/DisableReserva
-        // ---------------------------------------------------------
         [HttpPost("DisableReserva")]
         public async Task<IActionResult> DisableReserva([FromBody] ReservaRemove reserva)
         {

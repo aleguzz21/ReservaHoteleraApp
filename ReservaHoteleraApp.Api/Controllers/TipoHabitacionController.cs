@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR TIPOS DE HABITACIÓN
         // GET: api/TipoHabitacion
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN TIPO DE HABITACIÓN
         // GET: api/TipoHabitacion/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR TIPO DE HABITACIÓN
         // POST: api/TipoHabitacion/CreateTipoHabitacion
-        // ---------------------------------------------------------
         [HttpPost("CreateTipoHabitacion")]
         public async Task<IActionResult> Post([FromBody] TipoHabitacionAdd tipoHabitacion)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR TIPO DE HABITACIÓN
         // POST: api/TipoHabitacion/ModifyTipoHabitacion
-        // ---------------------------------------------------------
         [HttpPost("ModifyTipoHabitacion")]
         public async Task<IActionResult> Put([FromBody] TipoHabitacionUpdate tipoHabitacion)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR TIPO DE HABITACIÓN
         // POST: api/TipoHabitacion/DisableTipoHabitacion
-        // ---------------------------------------------------------
         [HttpPost("DisableTipoHabitacion")]
         public async Task<IActionResult> DisableTipoHabitacion([FromBody] TipoHabitacionRemove tipoHabitacion)
         {

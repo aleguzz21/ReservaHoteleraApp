@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR HOTELES
         // GET: api/Hotel
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // BUSCAR HOTELES POR DESTINO
         // GET: api/Hotel/Buscar?destino=Santo
-        // ---------------------------------------------------------
         [HttpGet("Buscar")]
         public async Task<IActionResult> Buscar([FromQuery] string? destino)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN HOTEL
         // GET: api/Hotel/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -79,10 +73,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR HOTEL
         // POST: api/Hotel/CreateHotel
-        // ---------------------------------------------------------
         [HttpPost("CreateHotel")]
         public async Task<IActionResult> Post([FromBody] HotelAdd hotel)
         {
@@ -96,10 +88,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR HOTEL
         // POST: api/Hotel/ModifyHotel
-        // ---------------------------------------------------------
         [HttpPost("ModifyHotel")]
         public async Task<IActionResult> Put([FromBody] HotelUpdate hotel)
         {
@@ -113,10 +103,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR HOTEL
         // POST: api/Hotel/DisableHotel
-        // ---------------------------------------------------------
         [HttpPost("DisableHotel")]
         public async Task<IActionResult> DisableHotel([FromBody] HotelRemove hotel)
         {

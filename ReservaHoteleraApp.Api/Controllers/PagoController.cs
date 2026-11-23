@@ -22,10 +22,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             _logger = logger;
         }
 
-        // ---------------------------------------------------------
         // LISTAR PAGOS
         // GET: api/Pago
-        // ---------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -43,10 +41,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // DETALLES DE UN PAGO
         // GET: api/Pago/5
-        // ---------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,10 +57,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // CREAR PAGO
         // POST: api/Pago/CreatePago
-        // ---------------------------------------------------------
         [HttpPost("CreatePago")]
         public async Task<IActionResult> Post([FromBody] PagoAdd pago)
         {
@@ -78,10 +72,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // EDITAR PAGO
         // POST: api/Pago/ModifyPago
-        // ---------------------------------------------------------
         [HttpPost("ModifyPago")]
         public async Task<IActionResult> Put([FromBody] PagoUpdate pago)
         {
@@ -95,10 +87,8 @@ namespace ReservaHoteleraApp.Api.Controllers
             return Ok(respuesta);
         }
 
-        // ---------------------------------------------------------
         // ELIMINAR PAGO
         // POST: api/Pago/DisablePago
-        // ---------------------------------------------------------
         [HttpPost("DisablePago")]
         public async Task<IActionResult> DisablePago([FromBody] PagoRemove pago)
         {
