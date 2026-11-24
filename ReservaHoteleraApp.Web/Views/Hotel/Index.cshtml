@@ -40,9 +40,17 @@
             <td>@Html.DisplayFor(m => item.Telefono)</td>
             <td>@Html.DisplayFor(m => item.Ciudad)</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalles</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a asp-action="Configurar" asp-route-id="@item.Id">Configurar</a> <text>|</text>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> <text>|</text>
+                }
+                <a asp-action="Details" asp-route-id="@item.Id">Detalles</a>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <text>|</text>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                }
             </td>
         </tr>
     }

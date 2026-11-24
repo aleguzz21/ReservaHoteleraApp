@@ -9,6 +9,9 @@ namespace ReservaHoteleraApp.DAL.Models.Result
         public int Capacidad { get; set; }
         public decimal Precio { get; set; }
 
+        public int IdHotel { get; set; }
+        public Hotel? Hotel { get; set; }
+
         public ICollection<Habitacion> Habitaciones { get; set; } = new List<Habitacion>();
     }
 }

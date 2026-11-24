@@ -24,6 +24,10 @@
     <dd class="col-sm-10">@Html.DisplayFor(m => m.Ciudad)</dd>
 </dl>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    @if (User.IsInRole("Administrador"))
+    {
+        <a asp-action="Configurar" asp-route-id="@Model.Id" class="btn btn-primary">Configurar hotel</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> <text>|</text>
+    }
     <a asp-action="Index">Volver a la lista</a>
 </div>

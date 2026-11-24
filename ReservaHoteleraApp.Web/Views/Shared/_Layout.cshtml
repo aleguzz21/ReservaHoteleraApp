@@ -68,21 +68,6 @@
                     <li class="booking-tab">
                         <a asp-area="" asp-controller="Hotel" asp-action="Index" title="Nivel 1 · Hotel">Hoteles</a>
                     </li>
-                    @if (User.IsInRole("Administrador"))
-                    {
-                        <li class="booking-tab">
-                            <a asp-area="" asp-controller="Bloque" asp-action="Index" title="Nivel 2 · Bloque (pertenece a un hotel)">Bloques</a>
-                        </li>
-                        <li class="booking-tab">
-                            <a asp-area="" asp-controller="Piso" asp-action="Index" title="Nivel 3 · Piso (pertenece a un bloque)">Pisos</a>
-                        </li>
-                        <li class="booking-tab">
-                            <a asp-area="" asp-controller="TipoHabitacion" asp-action="Index" title="Catálogo · Tipo de habitación (requerido por la habitación)">Tipos de Habitación</a>
-                        </li>
-                        <li class="booking-tab">
-                            <a asp-area="" asp-controller="Habitacion" asp-action="Index" title="Nivel 4 · Habitación (piso + tipo de habitación)">Habitaciones</a>
-                        </li>
-                    }
                 </ul>
             </div>
         </div>

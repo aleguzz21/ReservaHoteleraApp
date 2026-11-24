@@ -1,0 +1,409 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@* Vista: configuración unificada de un hotel.
+   En una sola página se administran bloques, pisos, tipos de habitación
+   y habitaciones. Cada sección tiene su lista y su formulario de alta/edición. *@
+@model HotelConfiguracionViewModel
+
+@{
+    ViewData["Title"] = "Configurar hotel";
+    var hotelId = Model.Hotel.Id;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start mb-2">
+    <div>
+        <h1 class="mb-0">Configurar hotel</h1>
+        <h4 class="text-muted">@Model.Hotel.Nombre</h4>
+        <p class="text-muted mb-0">
+            @Model.Hotel.Direccion
+            @if (!string.IsNullOrWhiteSpace(Model.Hotel.Ciudad))
+            {
+                <text> · @Model.Hotel.Ciudad</text>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Hotel.Telefono))
+            {
+                <text> · Tel. @Model.Hotel.Telefono</text>
+            }
+        </p>
+    </div>
+    <div class="mt-2">
+        <a asp-action="Edit" asp-route-id="@hotelId" class="btn btn-outline-secondary">Editar datos del hotel</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver a hoteles</a>
+    </div>
+</div>
+<hr />
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@* ============================ 1. BLOQUES ============================ *@
+<section class="mb-5">
+    <h3>1. Bloques</h3>
+    <p class="text-muted">Un hotel se divide en bloques (edificios o alas).</p>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Bloques.Any())
+                    {
+                        <tr><td colspan="3" class="text-muted">Aún no hay bloques en este hotel.</td></tr>
+                    }
+                    @foreach (var bloque in Model.Bloques)
+                    {
+                        <tr>
+                            <td>@bloque.Nombre</td>
+                            <td>@bloque.Descripcion</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-action="Configurar" asp-route-id="@hotelId"
+                                   asp-route-editar="bloque" asp-route-editarId="@bloque.Id">Editar</a>
+                                <form asp-action="EliminarBloque" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar el bloque @bloque.Nombre?');">
+                                    <input type="hidden" name="hotelId" value="@hotelId" />
+                                    <input type="hidden" name="id" value="@bloque.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@(Model.BloqueForm.Id > 0 ? "Editar bloque" : "Nuevo bloque")</h5>
+                    <form asp-action="GuardarBloque" method="post">
+                        <input type="hidden" name="hotelId" value="@hotelId" />
+                        <input type="hidden" asp-for="BloqueForm.Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-2">
+                            <label asp-for="BloqueForm.Nombre" class="form-label">Nombre</label>
+                            <input asp-for="BloqueForm.Nombre" class="form-control" />
+                            <span asp-validation-for="BloqueForm.Nombre" class="text-danger"></span>
+                        </div>
+                        <div class="mb-2">
+                            <label asp-for="BloqueForm.Descripcion" class="form-label">Descripción</label>
+                            <input asp-for="BloqueForm.Descripcion" class="form-control" />
+                            <span asp-validation-for="BloqueForm.Descripcion" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            @(Model.BloqueForm.Id > 0 ? "Guardar cambios" : "Agregar bloque")
+                        </button>
+                        @if (Model.BloqueForm.Id > 0)
+                        {
+                            <a asp-action="Configurar" asp-route-id="@hotelId" class="btn btn-link">Cancelar</a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ============================= 2. PISOS ============================= *@
+<section class="mb-5">
+    <h3>2. Pisos</h3>
+    <p class="text-muted">Cada piso pertenece a un bloque del hotel.</p>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Bloque</th>
+                        <th>Descripción</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Pisos.Any())
+                    {
+                        <tr><td colspan="4" class="text-muted">Aún no hay pisos en este hotel.</td></tr>
+                    }
+                    @foreach (var piso in Model.Pisos)
+                    {
+                        <tr>
+                            <td>@piso.Numero</td>
+                            <td>@piso.BloqueNombre</td>
+                            <td>@piso.Descripcion</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-action="Configurar" asp-route-id="@hotelId"
+                                   asp-route-editar="piso" asp-route-editarId="@piso.Id">Editar</a>
+                                <form asp-action="EliminarPiso" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar el piso @piso.Numero?');">
+                                    <input type="hidden" name="hotelId" value="@hotelId" />
+                                    <input type="hidden" name="id" value="@piso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@(Model.PisoForm.Id > 0 ? "Editar piso" : "Nuevo piso")</h5>
+                    @if (!Model.Bloques.Any())
+                    {
+                        <div class="alert alert-warning mb-0">Primero crea un bloque.</div>
+                    }
+                    else
+                    {
+                        <form asp-action="GuardarPiso" method="post">
+                            <input type="hidden" name="hotelId" value="@hotelId" />
+                            <input type="hidden" asp-for="PisoForm.Id" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="mb-2">
+                                <label asp-for="PisoForm.Numero" class="form-label">Número de piso</label>
+                                <input asp-for="PisoForm.Numero" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="PisoForm.Numero" class="text-danger"></span>
+                            </div>
+                            <div class="mb-2">
+                                <label asp-for="PisoForm.IdBloque" class="form-label">Bloque</label>
+                                <select asp-for="PisoForm.IdBloque" class="form-select"
+                                        asp-items="@(new SelectList(Model.Bloques, "Id", "Nombre"))">
+                                    <option value="">-- Seleccione un bloque --</option>
+                                </select>
+                                <span asp-validation-for="PisoForm.IdBloque" class="text-danger"></span>
+                            </div>
+                            <div class="mb-2">
+                                <label asp-for="PisoForm.Descripcion" class="form-label">Descripción</label>
+                                <input asp-for="PisoForm.Descripcion" class="form-control" />
+                                <span asp-validation-for="PisoForm.Descripcion" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                @(Model.PisoForm.Id > 0 ? "Guardar cambios" : "Agregar piso")
+                            </button>
+                            @if (Model.PisoForm.Id > 0)
+                            {
+                                <a asp-action="Configurar" asp-route-id="@hotelId" class="btn btn-link">Cancelar</a>
+                            }
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ====================== 3. TIPOS DE HABITACIÓN ====================== *@
+<section class="mb-5">
+    <h3>3. Tipos de habitación</h3>
+    <p class="text-muted">Tipos de habitación de este hotel (categoría y precio base).</p>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Capacidad</th>
+                        <th>Precio</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Tipos.Any())
+                    {
+                        <tr><td colspan="5" class="text-muted">Aún no hay tipos de habitación.</td></tr>
+                    }
+                    @foreach (var tipo in Model.Tipos)
+                    {
+                        <tr>
+                            <td>@tipo.Nombre</td>
+                            <td>@tipo.Descripcion</td>
+                            <td>@tipo.Capacidad</td>
+                            <td>@tipo.Precio.ToString("C")</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-action="Configurar" asp-route-id="@hotelId"
+                                   asp-route-editar="tipo" asp-route-editarId="@tipo.Id">Editar</a>
+                                <form asp-action="EliminarTipo" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar el tipo @tipo.Nombre?');">
+                                    <input type="hidden" name="hotelId" value="@hotelId" />
+                                    <input type="hidden" name="id" value="@tipo.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@(Model.TipoForm.Id > 0 ? "Editar tipo de habitación" : "Nuevo tipo de habitación")</h5>
+                    <form asp-action="GuardarTipo" method="post">
+                        <input type="hidden" name="hotelId" value="@hotelId" />
+                        <input type="hidden" asp-for="TipoForm.Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-2">
+                            <label asp-for="TipoForm.Nombre" class="form-label">Nombre</label>
+                            <input asp-for="TipoForm.Nombre" class="form-control" />
+                            <span asp-validation-for="TipoForm.Nombre" class="text-danger"></span>
+                        </div>
+                        <div class="mb-2">
+                            <label asp-for="TipoForm.Descripcion" class="form-label">Descripción</label>
+                            <input asp-for="TipoForm.Descripcion" class="form-control" />
+                            <span asp-validation-for="TipoForm.Descripcion" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <label asp-for="TipoForm.Capacidad" class="form-label">Capacidad</label>
+                                <input asp-for="TipoForm.Capacidad" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="TipoForm.Capacidad" class="text-danger"></span>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label asp-for="TipoForm.Precio" class="form-label">Precio base</label>
+                                <input asp-for="TipoForm.Precio" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="TipoForm.Precio" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            @(Model.TipoForm.Id > 0 ? "Guardar cambios" : "Agregar tipo")
+                        </button>
+                        @if (Model.TipoForm.Id > 0)
+                        {
+                            <a asp-action="Configurar" asp-route-id="@hotelId" class="btn btn-link">Cancelar</a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ========================== 4. HABITACIONES ========================= *@
+<section class="mb-5">
+    <h3>4. Habitaciones</h3>
+    <p class="text-muted">Cada habitación pertenece a un piso y a un tipo de habitación.</p>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Piso</th>
+                        <th>Tipo</th>
+                        <th>Precio/noche</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Habitaciones.Any())
+                    {
+                        <tr><td colspan="6" class="text-muted">Aún no hay habitaciones en este hotel.</td></tr>
+                    }
+                    @foreach (var habitacion in Model.Habitaciones)
+                    {
+                        <tr>
+                            <td>@habitacion.Numero</td>
+                            <td>@habitacion.PisoNumero</td>
+                            <td>@habitacion.TipoHabitacionNombre</td>
+                            <td>@habitacion.PrecioNoche.ToString("C")</td>
+                            <td>@habitacion.Estado</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-action="Configurar" asp-route-id="@hotelId"
+                                   asp-route-editar="habitacion" asp-route-editarId="@habitacion.Id">Editar</a>
+                                <form asp-action="EliminarHabitacion" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar la habitación @habitacion.Numero?');">
+                                    <input type="hidden" name="hotelId" value="@hotelId" />
+                                    <input type="hidden" name="id" value="@habitacion.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@(Model.HabitacionForm.Id > 0 ? "Editar habitación" : "Nueva habitación")</h5>
+                    @if (!Model.Pisos.Any() || !Model.Tipos.Any())
+                    {
+                        <div class="alert alert-warning mb-0">
+                            Para crear una habitación necesitas al menos un piso y un tipo de habitación.
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="GuardarHabitacion" method="post">
+                            <input type="hidden" name="hotelId" value="@hotelId" />
+                            <input type="hidden" asp-for="HabitacionForm.Id" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="mb-2">
+                                <label asp-for="HabitacionForm.Numero" class="form-label">Número de habitación</label>
+                                <input asp-for="HabitacionForm.Numero" class="form-control" />
+                                <span asp-validation-for="HabitacionForm.Numero" class="text-danger"></span>
+                            </div>
+                            <div class="mb-2">
+                                <label asp-for="HabitacionForm.IdPiso" class="form-label">Piso</label>
+                                <select asp-for="HabitacionForm.IdPiso" class="form-select"
+                                        asp-items="@(new SelectList(Model.Pisos, "Id", "Numero"))">
+                                    <option value="">-- Seleccione un piso --</option>
+                                </select>
+                                <span asp-validation-for="HabitacionForm.IdPiso" class="text-danger"></span>
+                            </div>
+                            <div class="mb-2">
+                                <label asp-for="HabitacionForm.IdTipoHabitacion" class="form-label">Tipo de habitación</label>
+                                <select asp-for="HabitacionForm.IdTipoHabitacion" class="form-select"
+                                        asp-items="@(new SelectList(Model.Tipos, "Id", "Nombre"))">
+                                    <option value="">-- Seleccione un tipo --</option>
+                                </select>
+                                <span asp-validation-for="HabitacionForm.IdTipoHabitacion" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-2">
+                                    <label asp-for="HabitacionForm.PrecioNoche" class="form-label">Precio/noche</label>
+                                    <input asp-for="HabitacionForm.PrecioNoche" class="form-control" type="number" step="0.01" min="0" />
+                                    <span asp-validation-for="HabitacionForm.PrecioNoche" class="text-danger"></span>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <label asp-for="HabitacionForm.Estado" class="form-label">Estado</label>
+                                    <select asp-for="HabitacionForm.Estado" class="form-select">
+                                        <option value="Disponible" selected="@(Model.HabitacionForm.Estado == "Disponible")">Disponible</option>
+                                        <option value="Ocupada" selected="@(Model.HabitacionForm.Estado == "Ocupada")">Ocupada</option>
+                                        <option value="Mantenimiento" selected="@(Model.HabitacionForm.Estado == "Mantenimiento")">Mantenimiento</option>
+                                    </select>
+                                    <span asp-validation-for="HabitacionForm.Estado" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                @(Model.HabitacionForm.Id > 0 ? "Guardar cambios" : "Agregar habitación")
+                            </button>
+                            @if (Model.HabitacionForm.Id > 0)
+                            {
+                                <a asp-action="Configurar" asp-route-id="@hotelId" class="btn btn-link">Cancelar</a>
+                            }
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

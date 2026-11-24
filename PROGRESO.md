@@ -1842,3 +1842,155 @@ Notas:
 - **22/11/2026:** Swagger configurado con Swashbuckle 11.0.1; plantilla `WeatherForecast` eliminada.
 - **22/11/2026:** `HotelRepository.AddAsync` blindado (null + `ValidateHotel`).
 - **22/11/2026:** Verificado build (0/0), pruebas (6/6), Swagger (200, 64 rutas), GET/POST y Web (200).
+
+---
+
+# Parte 7 — Configuración unificada del hotel (24/11/2026)
+
+**Objetivo:** el maestro pidió que la configuración del hotel no esté separada:
+bloques, pisos, tipos de habitación y habitaciones deben administrarse juntos,
+dentro de cada hotel.
+
+## 43. Qué se hizo
+
+- Nueva acción `HotelController.Configurar(int id)` (`GET /Hotel/Configurar/5`).
+  - Carga el hotel y **solo** sus bloques; los pisos de esos bloques; las
+    habitaciones de esos pisos; y el catálogo global de tipos de habitación.
+  - Acepta `?editar=bloque|piso|tipo|habitacion&editarId=N` para precargar el
+    formulario de edición correspondiente.
+- Acciones POST en `HotelController` que guardan o eliminan cada entidad y
+  vuelven a `Configurar`:
+  - `GuardarBloque`, `GuardarPiso`, `GuardarTipo`, `GuardarHabitacion`
+    (crean si `Id == 0`; actualizan si `Id > 0`).
+  - `EliminarBloque`, `EliminarPiso`, `EliminarTipo`, `EliminarHabitacion`.
+- Nueva vista `Views/Hotel/Configurar.cshtml` con 4 secciones (Bloques, Pisos,
+  Tipos de habitación, Habitaciones). Cada sección tiene su tabla y su
+  formulario de alta/edición en la misma página.
+- Nuevo `Web\Models\HotelConfiguracionViewModel.cs` con el modelo de la página y
+  los formularios `BloqueConfigForm`, `PisoConfigForm`,
+  `TipoHabitacionConfigForm` y `HabitacionConfigForm`.
+- Enlaces «Configurar» añadidos en `Hotel/Index` y `Hotel/Details` (solo
+  administrador).
+- Se quitaron del menú superior las pestañas Bloques, Pisos, Tipos de Habitación
+  y Habitaciones. Quedan solo **Inicio** y **Hoteles**; todo lo demás se entra
+  desde la configuración de cada hotel.
+
+## 44. Reglas y decisiones
+
+- ~~El catálogo de tipos de habitación sigue siendo **global** (no tiene `IdHotel`).~~
+  **Actualizado en §47:** los tipos ahora pertenecen a cada hotel (`IdHotel`).
+- Los desplegables de piso/habitación solo ofrecen bloques y pisos del hotel
+  abierto, así no se puede mezclar configuración entre hoteles desde esta página.
+- Los controladores y vistas separados (`Bloque`, `Piso`, `TipoHabitacion`,
+  `Habitacion`) **siguen existiendo** como respaldo por URL, pero ya no están en
+  el menú.
+- La vista `Habitacion/Index` se mantiene pública porque es donde el cliente
+  busca habitaciones disponibles y reserva.
+
+## 45. Verificación
+
+- `dotnet build ReservaHoteleraApp.slnx`: **0 errores, 0 advertencias**.
+- `dotnet test ReservaHoteleraApp.slnx`: **6/6 correctas**.
+- `GET /Hotel` → 200.
+- `GET /Hotel/Configurar/1` sin sesión → 302 a
+  `/Account/Login?ReturnUrl=%2FHotel%2FConfigurar%2F1`.
+
+## 46. Cómo probar a mano
+
+1. Entrar como `Aleguzz21` (Administrador).
+2. `Hoteles` → en la fila del hotel pulsar **Configurar** (o `Hotel/Details` →
+   **Configurar hotel**).
+3. Crear un bloque → luego un piso de ese bloque → un tipo de habitación →
+   una habitación del piso.
+4. Editar cada uno con el botón **Editar** (el formulario se precarga arriba) y
+   eliminar con **Eliminar**.
+5. Confirmar que el menú ya no muestra las pestañas separadas.
+
+## 47. Cambio: tipos de habitación por hotel (24/11/2026)
+
+El maestro pidió que los tipos de habitación **no** fueran un catálogo global, sino
+propios de cada hotel. Se agregó `IdHotel` a la tabla `TiposHabitacion`.
+
+### Cambios por capa
+
+| Capa | Archivo | Cambio |
+|---|---|---|
+| Entidad | `DAL\Models\Result\TipoHabitacion.cs` | `IdHotel` + navegación `Hotel`. |
+| Entidad | `DAL\Models\Result\Hotel.cs` | Colección `TiposHabitacion`. |
+| Config EF | `DAL\Configurations\TipoHabitacionConfiguration.cs` | FK a `Hoteles` (Restrict) e índice único `(IdHotel, Nombre)` en vez de `Nombre` global. |
+| DTO | `DAL\Models\Objects\TipoHabitacion\TipoHabitacionBase.cs` | `IdHotel`. |
+| DTO | `DAL\Models\Objects\TipoHabitacion\TipoHabitacionModel.cs` | `HotelNombre`. |
+| DAL | `TipoHabitacionRepository.cs` | `Include(Hotel)`, guarda `IdHotel`, valida `IdHotel > 0`, mapea hotel. |
+| BL | `TipoHabitacionServices.cs` | Valida `IdHotel > 0`. |
+| Web | `HotelController.cs` | `Configurar` filtra tipos por hotel; `GuardarTipo` envía `IdHotel = hotelId`. |
+| Web | `Views\Hotel\Configurar.cshtml` | Texto de la sección 3: «Tipos de habitación de este hotel». |
+| Web | `TipoHabitacionController.cs` + `Views\TipoHabitacion\{Create,Edit}.cshtml` | La página antigua ahora pide el hotel (dropdown) para no romperse. |
+| BD | `Migrations\20261124212308_AddHotelIdToTiposHabitacion.cs` | Migración aplicada. |
+
+### Migración de datos
+
+- Se agregó `IdHotel` a `TiposHabitacion` (NOT NULL) y se **asignaron los tipos
+  existentes al primer hotel** (`MIN(Id) FROM Hoteles`). Si no hubiera hoteles, la
+  migración crea «Hotel principal».
+- El nombre del tipo ahora es único **por hotel**: `IX_TiposHabitacion_IdHotel_Nombre`.
+- Resultado inicial en `HotelDB`: los 3 tipos existentes quedaron en el hotel Id 2
+  («The Marriot»). Los demás hoteles (3, 4, 5) empiezan sin tipos y se crean desde
+  su configuración. Esta asignación se corrigió después para que cada tipo quede en
+  el hotel de la habitación que lo usa (ver §49).
+
+### Verificación
+
+- `dotnet ef database update`: migración aplicada correctamente.
+- `dotnet build`: 0 errores, 0 advertencias.
+- `dotnet test`: 6/6.
+- `GET /Hotel` → 200; `GET /Hotel/Configurar/2` sin sesión → 302 al login.
+
+### Cómo probar a mano
+
+1. Entrar como administrador y abrir `Hoteles` → **Configurar** en «The Marriot»:
+   la sección 3 muestra sus 3 tipos.
+2. Abrir **Configurar** en otro hotel (p. ej. «Embassy Suites»): la sección 3 debe
+   estar vacía y permitir crear tipos propios (puede repetir nombres como
+   «Suite Presidencial» porque el nombre es único por hotel).
+
+## 48. Historial de avance (configuración unificada)
+
+- **24/11/2026:** nueva página `Hotel/Configurar/{id}` con secciones de bloques,
+  pisos, tipos de habitación y habitaciones; alta/edición/eliminación en la misma
+  pantalla (`HotelController` + `HotelConfiguracionViewModel`).
+- **24/11/2026:** enlaces «Configurar» en `Hotel/Index` y `Hotel/Details`.
+- **24/11/2026:** se quitaron del menú las pestañas separadas; quedan Inicio y Hoteles.
+- **24/11/2026:** los tipos de habitación pasaron a ser **por hotel** (`IdHotel`,
+  migración `AddHotelIdToTiposHabitacion`); tipos existentes asignados al hotel Id 2.
+- **24/11/2026:** verificado build (0/0), tests (6/6) y rutas (`/Hotel` 200,
+  `/Hotel/Configurar/2` 302 al login).
+- **24/11/2026:** tipos 3 y 4 reasignados a Embassy Suites y Ramada para que
+  coincidan con el hotel de sus habitaciones (§49).
+
+## 49. Corrección de datos: tipos de habitación coherentes con su hotel (24/11/2026)
+
+La migración de §47 asignó los 3 tipos existentes al hotel Id 2 («The Marriot»),
+pero las habitaciones 003 y 401 (de otros hoteles) seguían usando esos tipos. Se
+corrigió la asignación para que cada tipo pertenezca al hotel de la habitación que
+lo usa:
+
+| Tipo (Id) | Hotel asignado | Habitación que lo usa |
+|---|---|---|
+| Suite Presidencial (2) | 2 · The Marriot | 109 (The Marriot) |
+| Habitaciones ejecutivas (3) | 3 · Embassy Suites by Hilton Santo Domingo | 003 (Embassy Suites) |
+| Habitación Estándar (4) | 4 · Ramada by Wyndham Princess | 401 (Ramada) |
+
+SQL aplicado (en transacción, por Id para evitar problemas de acentos):
+
+```sql
+UPDATE TiposHabitacion SET IdHotel = 3, ModifyDate = GETUTCDATE() WHERE Id = 3;
+UPDATE TiposHabitacion SET IdHotel = 4, ModifyDate = GETUTCDATE() WHERE Id = 4;
+```
+
+Verificación: `TiposHabitacion.IdHotel` coincide con el hotel de cada habitación y
+el índice único `(IdHotel, Nombre)` sigue válido. Es solo cambio de datos: no hubo
+cambios de código ni migración nueva (el estado ya quedó aplicado en la BD).
+
+**Estado actual:** configuración del hotel unificada y tipos por hotel, con la base
+de datos migrada. Pendientes de la lista anterior (CRUD de administrador en
+Estadía/Pago/Cliente, estilos, etc.) siguen abiertos.

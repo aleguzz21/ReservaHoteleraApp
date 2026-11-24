@@ -24,7 +24,15 @@ namespace ReservaHoteleraApp.DAL.Configurations
             builder.Property(t => t.Precio)
                 .HasPrecision(18, 2);
 
-            builder.HasIndex(t => t.Nombre).IsUnique();
+            // Los tipos de habitación pertenecen a un hotel.
+            // El nombre es único dentro de cada hotel, no a nivel global.
+            builder.HasIndex(t => new { t.IdHotel, t.Nombre })
+                .IsUnique();
+
+            builder.HasOne(t => t.Hotel)
+                .WithMany(h => h.TiposHabitacion)
+                .HasForeignKey(t => t.IdHotel)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

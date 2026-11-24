@@ -12,6 +12,7 @@ namespace ReservaHoteleraApp.DAL.Models.Result
         public string? Ciudad { get; set; }
 
         public ICollection<Bloque>Bloques { get; set; } = new List<Bloque>();
+        public ICollection<TipoHabitacion> TiposHabitacion { get; set; } = new List<TipoHabitacion>();
 
     }
 

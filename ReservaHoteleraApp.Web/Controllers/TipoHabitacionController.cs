@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ReservaHoteleraApp.BL.Services.Interfaces;
 using ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion;
 
@@ -12,10 +13,19 @@ namespace ReservaHoteleraApp.Web.Controllers
     public class TipoHabitacionController : Controller
     {
         private readonly ITipoHabitacionServices _tipoHabitacionServices;
+        private readonly IHotelServices _hotelServices;
 
-        public TipoHabitacionController(ITipoHabitacionServices tipoHabitacionServices)
+        public TipoHabitacionController(ITipoHabitacionServices tipoHabitacionServices, IHotelServices hotelServices)
         {
             _tipoHabitacionServices = tipoHabitacionServices;
+            _hotelServices = hotelServices;
+        }
+
+        // Llena el desplegable de hoteles del formulario.
+        private async Task CargarHotelesAsync(int? seleccionado = null)
+        {
+            var hoteles = await _hotelServices.GetAllAsync();
+            ViewBag.Hoteles = new SelectList(hoteles.Data ?? new(), "Id", "Nombre", seleccionado);
         }
 
         // GET /TipoHabitacion -> lista de tipos.
@@ -41,8 +51,9 @@ namespace ReservaHoteleraApp.Web.Controllers
         }
 
         // GET /TipoHabitacion/Create -> formulario vacío.
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await CargarHotelesAsync();
             return View();
         }
 
@@ -52,12 +63,16 @@ namespace ReservaHoteleraApp.Web.Controllers
         public async Task<IActionResult> Create(TipoHabitacionAdd tipoHabitacion)
         {
             if (!ModelState.IsValid)
+            {
+                await CargarHotelesAsync(tipoHabitacion.IdHotel);
                 return View(tipoHabitacion);
+            }
 
             var result = await _tipoHabitacionServices.AddAsync(tipoHabitacion);
             if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, result.Message ?? "No se pudo registrar el tipo de habitación.");
+                await CargarHotelesAsync(tipoHabitacion.IdHotel);
                 return View(tipoHabitacion);
             }
 
@@ -82,8 +97,10 @@ namespace ReservaHoteleraApp.Web.Controllers
                 Nombre = result.Data.Nombre,
                 Descripcion = result.Data.Descripcion,
                 Capacidad = result.Data.Capacidad,
-                Precio = result.Data.Precio
+                Precio = result.Data.Precio,
+                IdHotel = result.Data.IdHotel
             };
+            await CargarHotelesAsync(model.IdHotel);
             return View(model);
         }
 
@@ -93,12 +110,16 @@ namespace ReservaHoteleraApp.Web.Controllers
         public async Task<IActionResult> Edit(TipoHabitacionUpdate tipoHabitacion)
         {
             if (!ModelState.IsValid)
+            {
+                await CargarHotelesAsync(tipoHabitacion.IdHotel);
                 return View(tipoHabitacion);
+            }
 
             var result = await _tipoHabitacionServices.UpdateAsync(tipoHabitacion);
             if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, result.Message ?? "No se pudo actualizar el tipo de habitación.");
+                await CargarHotelesAsync(tipoHabitacion.IdHotel);
                 return View(tipoHabitacion);
             }
 

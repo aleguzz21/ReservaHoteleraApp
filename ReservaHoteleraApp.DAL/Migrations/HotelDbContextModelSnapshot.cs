@@ -471,6 +471,9 @@ namespace ReservaHoteleraApp.DAL.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<int>("IdHotel")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ModifyDate")
                         .HasColumnType("datetime2");
 
@@ -488,7 +491,7 @@ namespace ReservaHoteleraApp.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Nombre")
+                    b.HasIndex("IdHotel", "Nombre")
                         .IsUnique();
 
                     b.ToTable("TiposHabitacion", (string)null);
@@ -656,6 +659,17 @@ namespace ReservaHoteleraApp.DAL.Migrations
                     b.Navigation("Habitacion");
                 });
 
+            modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.TipoHabitacion", b =>
+                {
+                    b.HasOne("ReservaHoteleraApp.DAL.Models.Result.Hotel", "Hotel")
+                        .WithMany("TiposHabitacion")
+                        .HasForeignKey("IdHotel")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Bloque", b =>
                 {
                     b.Navigation("Pisos");
@@ -674,6 +688,8 @@ namespace ReservaHoteleraApp.DAL.Migrations
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Hotel", b =>
                 {
                     b.Navigation("Bloques");
+
+                    b.Navigation("TiposHabitacion");
                 });
 
             modelBuilder.Entity("ReservaHoteleraApp.DAL.Models.Result.Piso", b =>

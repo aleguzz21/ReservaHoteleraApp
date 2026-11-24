@@ -93,6 +93,8 @@ namespace ReservaHoteleraApp.BL.Services.Implementations
                 return "La capacidad debe ser mayor que cero.";
             if (tipoHabitacion.Precio < 0)
                 return "El precio no puede ser negativo.";
+            if (tipoHabitacion.IdHotel <= 0)
+                return "Debe seleccionar un hotel.";
 
             return null;
         }

@@ -27,7 +27,8 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
             try
             {
                 // AsNoTracking = consulta de solo lectura (más rápida).
-                var tipos = await context.TiposHabitacion.AsNoTracking().ToListAsync();
+                // Include(t => t.Hotel) trae el hotel al que pertenece cada tipo.
+                var tipos = await context.TiposHabitacion.AsNoTracking().Include(t => t.Hotel).ToListAsync();
                 var models = tipos.Select(MapToModel).ToList();
 
                 return new OperationResult<List<TipoHabitacionModel>>
@@ -81,6 +82,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                     Descripcion = tipoHabitacion.Descripcion?.Trim(),
                     Capacidad = tipoHabitacion.Capacidad,
                     Precio = tipoHabitacion.Precio,
+                    IdHotel = tipoHabitacion.IdHotel,
                     CreatedDate = DateTime.UtcNow,
                     CreatedUser = tipoHabitacion.CreatedUser
                 };
@@ -125,6 +127,7 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 entity.Descripcion = tipoHabitacion.Descripcion?.Trim();
                 entity.Capacidad = tipoHabitacion.Capacidad;
                 entity.Precio = tipoHabitacion.Precio;
+                entity.IdHotel = tipoHabitacion.IdHotel;
                 entity.ModifyDate = DateTime.UtcNow;
                 entity.ModifyUser = tipoHabitacion.ModifyUser;
 
@@ -193,6 +196,8 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 return "La capacidad debe ser mayor que cero.";
             if (tipoHabitacion.Precio < 0)
                 return "El precio no puede ser negativo.";
+            if (tipoHabitacion.IdHotel <= 0)
+                return "Debe seleccionar un hotel.";
 
             return null;
         }
@@ -206,7 +211,9 @@ namespace ReservaHoteleraApp.DAL.Repositories.ImplementationsDAL
                 Nombre = tipoHabitacion.Nombre,
                 Descripcion = tipoHabitacion.Descripcion,
                 Capacidad = tipoHabitacion.Capacidad,
-                Precio = tipoHabitacion.Precio
+                Precio = tipoHabitacion.Precio,
+                IdHotel = tipoHabitacion.IdHotel,
+                HotelNombre = tipoHabitacion.Hotel?.Nombre
             };
         }
     }

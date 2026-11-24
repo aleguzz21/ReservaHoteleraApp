@@ -6,5 +6,6 @@ namespace ReservaHoteleraApp.DAL.Models.Objects.TipoHabitacion
         public string? Descripcion { get; set; }
         public int Capacidad { get; set; }
         public decimal Precio { get; set; }
+        public int IdHotel { get; set; }
     }
 }
